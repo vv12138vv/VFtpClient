@@ -67,7 +67,7 @@ void Client::PWD(){
 void Client::handleFtpResp(const FtpResp &ftpResp) {
     switch (ftpResp.statusCode_) {
         case FTP_NEED_PASSWORD:{
-            QString cmd = "PASS vv12138vv\n";
+            QString cmd = "PASS \n";
             QByteArray writeData = cmd.toUtf8();
             controlSocket_->write(writeData);
             break;

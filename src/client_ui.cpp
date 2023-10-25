@@ -37,8 +37,6 @@ void ClientUi::onConnectBtnClicked() {
 //    if(targetHost_.isNull()||targetPort_==0||username_.isNull()||password_.isNull()){
 //        return;
 //    }
-    QHostAddress host("124.223.65.182");
-    quint32 port=21;
     client_->connectTo(host,port);
 }
 
