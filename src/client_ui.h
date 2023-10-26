@@ -37,9 +37,13 @@ public slots:
     void onUsernameBarEdited();
     void onPasswordBarEdited();
     void onNewLog(const QString& logMsg);
+    void onFileTableUpdate(const QVector<FtpFileInfo>&);
+    void onServerPathUpdate(const QString&);
     void onPWDtestBtnClicked();
     void onLISTtestBtnClicked();
     void onPASVtestBtnClicked();
+    void onMKDtestBtnClicked();
+    void onRMDtestBtnClicked();
 };
 
 

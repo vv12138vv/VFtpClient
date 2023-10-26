@@ -11,6 +11,11 @@ Client::Client(QObject *parent) : QObject(parent) {
     connect(controlSocket_, &QTcpSocket::disconnected, this, &Client::onControlSocketDisconnected);
     connect(controlSocket_, &QTcpSocket::readyRead, this, &Client::onControlSocketReadyRead);
     connect(controlSocket_, &QTcpSocket::bytesWritten, this, &Client::onControlSocketWritten);
+    dataSocket_ = new QTcpSocket(this);
+    connect(dataSocket_,&QTcpSocket::connected,this,&Client::onDataSocketConnected);
+    connect(dataSocket_,&QTcpSocket::disconnected,this,&Client::onDataSocketDisconnected);
+    connect(dataSocket_,&QTcpSocket::readyRead,this,&Client::onDataSocketReadyRead);
+    connect(dataSocket_,&QTcpSocket::bytesWritten,this,&Client::onDataSocketWritten);
 }
 
 Client::~Client() {
@@ -32,10 +37,17 @@ void Client::onControlSocketDisconnected() {
 
 void Client::onControlSocketReadyRead() {
     QByteArray data = controlSocket_->readAll();
-//    qDebug() << "QByteArray:" << data << "\n";
-    QString response = QString(data);
-    qDebug()<<"QString:"<<response<<'\n';
-    FtpResp ftpResp(response);
+    QString dataStr = QString(data);
+    QStringList responses=dataStr.split("\r\n");
+    responses.removeAll("");
+    for(auto & response : responses){
+        response+="\r\n";
+    }
+    for(const auto& i:responses){
+        qDebug()<<"test"<<i<<'\n';
+    }
+//    qDebug() << "QString:" << response << '\n';
+    FtpResp ftpResp(dataStr);
 //    qDebug()<<"statusCode:"<<ftpResp.statusCode_<<"\n";
 //    qDebug()<<"statusMsg:"<<ftpResp.statusMsg_<<"\n";
     handleFtpResp(ftpResp);
@@ -54,48 +66,69 @@ Logger *Client::getLogger() {
 }
 
 void Client::login(const QString &username, const QString &password) {
-    QString cmd = "USER " + username + '\n';
+    QString cmd = "USER " + username + "\r\n";
     QByteArray writeData = cmd.toUtf8();
     controlSocket_->write(writeData);
 }
 
-void Client::PWD(){
-    QString cmd="PWD\n";
+void Client::PWD() {
+    QString cmd = "PWD\r\n";
     controlSocket_->write(cmd.toUtf8());
 }
 
 void Client::handleFtpResp(const FtpResp &ftpResp) {
     switch (ftpResp.statusCode_) {
-        case FTP_NEED_PASSWORD:{
-            QString cmd = "PASS \n";
+        case FTP_NEED_PASSWORD: {
+            QString cmd = "PASS vv12138vv\r\n";
             QByteArray writeData = cmd.toUtf8();
             controlSocket_->write(writeData);
             break;
         }
-        case FTP_CONNECT_SUCCESS:{
+        case FTP_PASV: {
+            auto pair = Util::parsePasvResp(ftpResp.statusMsg_);
+            qDebug()<<pair.first<<"\r\n";
+            qDebug()<<pair.second<<"\r\n";
+            dataSocket_->connectToHost(QHostAddress(pair.first), pair.second);
+            break;
+        }
+        case FTP_CONNECT_SUCCESS: {
             logger_->log("连接成功");
             break;
         }
-        case FTP_LOGIN_SUCCESS:{
+        case FTP_LOGIN_SUCCESS: {
             logger_->log("登录成功");
             break;
         }
-        case FTP_LOGIN_INCORRECT:{
+        case FTP_LOGIN_INCORRECT: {
             logger_->log("登陆失败，请重新输入用户名密码");
             break;
         }
-        case FTP_END:{
+        case FTP_END: {
             logger_->log("再见");
             break;
         }
-        case FTP_CONNECTION_ERROR:{
-            logger_->log("连接错误");
+        case FTP_CONNECTION_ERROR: {
+            logger_->log(ftpResp.statusMsg_);
             break;
         }
-        case FTP_TIME_OUT:{
+        case FTP_TIME_OUT: {
             logger_->log("连接超时");
+            break;
         }
-        default:{
+        case FTP_FILE_ACTION_COMPLETED:{
+            logger_->log("文件操作成功");
+            break;
+        }
+        case FTP_LIST_DIR:{
+            logger_->log("成功获取文件目录");
+            break;
+        }
+        case FTP_PATHNAME_CREATED:{
+            logger_->log("成功获取路径");
+            QString path=qMove(Util::parsePath(ftpResp.statusMsg_));
+            emit serverPathUpdate(path);
+        }
+        default: {
             break;
         }
     }
@@ -103,12 +136,57 @@ void Client::handleFtpResp(const FtpResp &ftpResp) {
 }
 
 void Client::LIST() {
-    QString cmd="LIST .\n";
+    PWD();
+    PASV();
+    QString cmd = "LIST\r\n";
     controlSocket_->write(cmd.toUtf8());
+//    logger_->log(cmd);
 }
 
 void Client::PASV() {
-    QString cmd="PASV\n";
+    QString cmd = "PASV\r\n";
     controlSocket_->write(cmd.toUtf8());
 }
+
+
+void Client::onDataSocketConnected() {
+    qDebug()<<"dataSocket connected"<<"\n";
+}
+
+void Client::onDataSocketDisconnected() {
+    qDebug()<<"dataSocket disconnected"<<"\n";
+}
+
+void Client::onDataSocketReadyRead() {
+    QByteArray data=dataSocket_->readAll();
+    QString fileListStr(data);
+    auto fileInfoList=Util::parseFtpList(fileListStr);
+    for(auto i:fileInfoList){
+        i.print();
+    }
+    emit  fileTableUpdate(fileInfoList);
+}
+
+void Client::onDataSocketWritten() {
+
+}
+
+void Client::MKD(const QString& dirName) {
+    QString testName="testFolder";
+    QString cmd="MKD "+testName+"\r\n";
+    controlSocket_->write(cmd.toUtf8());
+}
+
+void Client::RMD(const QString& dirName) {
+    QString testName="testFolder";
+    QString cmd="RMD "+testName+"\r\n";
+    controlSocket_->write(cmd.toUtf8());
+}
+
+void Client::RETR(const QString& fileName) {
+
+}
+
+
+
 

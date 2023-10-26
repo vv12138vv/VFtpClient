@@ -9,13 +9,18 @@
 #include<QTcpSocket>
 #include<QPointer>
 #include<QHostAddress>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 #include"logger.h"
 #include"common.h"
+#include"util.h"
+
 class Client : public QObject {
 Q_OBJECT
 
 private:
     QPointer<QTcpSocket> controlSocket_;
+    QPointer<QTcpSocket> dataSocket_;
     QPointer<Logger> logger_;
 public:
     explicit Client(QObject *parent = nullptr);
@@ -31,9 +36,21 @@ public:
     void login(const QString &username, const QString &password);
 
     void PWD();
+
     void LIST();
+
     void PASV();
-    void handleFtpResp(const FtpResp&);
+
+    void MKD(const QString&);
+
+    void RMD(const QString&);
+    void RETR(const QString&);
+
+    void handleFtpResp(const FtpResp &);
+
+signals:
+    void fileTableUpdate(const QVector<FtpFileInfo>&);
+    void serverPathUpdate(const QString&);
 public slots:
 
     void onControlSocketConnected();
@@ -43,6 +60,15 @@ public slots:
     void onControlSocketReadyRead();
 
     void onControlSocketWritten();
+
+    void onDataSocketConnected();
+
+    void onDataSocketDisconnected();
+
+    void onDataSocketReadyRead();
+
+    void onDataSocketWritten();
+
 
 };
 

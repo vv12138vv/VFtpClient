@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>900</width>
+    <height>750</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -145,10 +145,10 @@
   <widget class="QTextBrowser" name="systemMsgBrowser">
    <property name="geometry">
     <rect>
-     <x>530</x>
-     <y>150</y>
-     <width>261</width>
-     <height>431</height>
+     <x>440</x>
+     <y>190</y>
+     <width>441</width>
+     <height>171</height>
     </rect>
    </property>
   </widget>
@@ -168,8 +168,8 @@
   <widget class="QPushButton" name="PWDtestBtn">
    <property name="geometry">
     <rect>
-     <x>420</x>
-     <y>150</y>
+     <x>440</x>
+     <y>110</y>
      <width>75</width>
      <height>24</height>
     </rect>
@@ -181,8 +181,8 @@
   <widget class="QPushButton" name="LISTtestBtn">
    <property name="geometry">
     <rect>
-     <x>420</x>
-     <y>200</y>
+     <x>540</x>
+     <y>110</y>
      <width>75</width>
      <height>24</height>
     </rect>
@@ -194,14 +194,63 @@
   <widget class="QPushButton" name="PASVtestBtn">
    <property name="geometry">
     <rect>
-     <x>420</x>
-     <y>250</y>
+     <x>640</x>
+     <y>110</y>
      <width>75</width>
      <height>24</height>
     </rect>
    </property>
    <property name="text">
     <string>PASV</string>
+   </property>
+  </widget>
+  <widget class="QTableWidget" name="serverFileTable">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>400</y>
+     <width>441</width>
+     <height>321</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="serverPathLabel">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>370</y>
+     <width>81</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="MKDtestBtn">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>110</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>MKD</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="RMDtestBtn">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>150</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>RMD</string>
    </property>
   </widget>
  </widget>
