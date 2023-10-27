@@ -22,6 +22,7 @@ private:
     QPointer<QTcpSocket> controlSocket_;
     QPointer<QTcpSocket> dataSocket_;
     QPointer<Logger> logger_;
+    QByteArray controlReadBuffer_;
 public:
     explicit Client(QObject *parent = nullptr);
 
@@ -47,6 +48,8 @@ public:
     void RETR(const QString&);
 
     void handleFtpResp(const FtpResp &);
+
+    void handle257(const FtpResp &ftpResp);
 
 signals:
     void fileTableUpdate(const QVector<FtpFileInfo>&);

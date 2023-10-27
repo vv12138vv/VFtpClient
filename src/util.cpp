@@ -39,8 +39,12 @@ QVector<FtpFileInfo> Util::parseFtpList(const QString &ftpList) {
     return fileList;
 }
 
-QString Util::parsePath(const QString &path) {
-    qsizetype index=path.indexOf("is");
-    QString res=path.mid(0,index).trimmed();
-    return res;
+QString Util::parsePath(const QString &msg) {
+    QRegularExpression regex("\"([^\"]*)\"");
+    QRegularExpressionMatch match=regex.match(msg);
+    if(match.hasMatch()){
+
+        return match.captured(0);
+    }
+    return "";
 }
