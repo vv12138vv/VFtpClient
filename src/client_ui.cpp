@@ -264,7 +264,7 @@ void ClientUi::onClientFileTableCell2Clicked(int row, int column) {
     nextPath=folderInfo2.canonicalFilePath();
     emit onClientPathUpdate(nextPath);
 }
-
+// Todo 选中文件,然后上传与下载
 
 
 
