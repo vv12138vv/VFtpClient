@@ -24,6 +24,7 @@ private:
     quint16 targetPort_;
     QString username_;
     QString password_;
+    QString nextPath_;
 public:
     explicit ClientUi(QWidget *parent = nullptr);
     void initSlots();
@@ -39,11 +40,18 @@ public slots:
     void onNewLog(const QString& logMsg);
     void onFileTableUpdate(const QVector<FtpFileInfo>&);
     void onServerPathUpdate(const QString&);
+    void onServerFileTableCellClicked(int row,int column);
+    void onServerFileTableCell2Clicked(int row,int column);
+
+
     void onPWDtestBtnClicked();
     void onLISTtestBtnClicked();
     void onPASVtestBtnClicked();
     void onMKDtestBtnClicked();
     void onRMDtestBtnClicked();
+    void onCWDtestBtnClicked();
+    void onRETRtestBtnClicked();
+    void onSTORtestBtnClicked();
 };
 
 

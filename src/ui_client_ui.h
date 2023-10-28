@@ -39,9 +39,12 @@ public:
     QPushButton *LISTtestBtn;
     QPushButton *PASVtestBtn;
     QTableWidget *serverFileTable;
-    QLabel *serverPathLabel;
     QPushButton *MKDtestBtn;
     QPushButton *RMDtestBtn;
+    QPushButton *CWDTestBtn;
+    QPushButton *RETRtestBtn;
+    QLineEdit *serverPathBar;
+    QPushButton *STORtestBtn;
 
     void setupUi(QWidget *ClientUi)
     {
@@ -100,15 +103,24 @@ public:
         serverFileTable = new QTableWidget(ClientUi);
         serverFileTable->setObjectName("serverFileTable");
         serverFileTable->setGeometry(QRect(440, 400, 441, 321));
-        serverPathLabel = new QLabel(ClientUi);
-        serverPathLabel->setObjectName("serverPathLabel");
-        serverPathLabel->setGeometry(QRect(440, 370, 81, 21));
         MKDtestBtn = new QPushButton(ClientUi);
         MKDtestBtn->setObjectName("MKDtestBtn");
         MKDtestBtn->setGeometry(QRect(740, 110, 75, 24));
         RMDtestBtn = new QPushButton(ClientUi);
         RMDtestBtn->setObjectName("RMDtestBtn");
         RMDtestBtn->setGeometry(QRect(440, 150, 75, 24));
+        CWDTestBtn = new QPushButton(ClientUi);
+        CWDTestBtn->setObjectName("CWDTestBtn");
+        CWDTestBtn->setGeometry(QRect(540, 150, 75, 24));
+        RETRtestBtn = new QPushButton(ClientUi);
+        RETRtestBtn->setObjectName("RETRtestBtn");
+        RETRtestBtn->setGeometry(QRect(640, 150, 75, 24));
+        serverPathBar = new QLineEdit(ClientUi);
+        serverPathBar->setObjectName("serverPathBar");
+        serverPathBar->setGeometry(QRect(440, 370, 441, 22));
+        STORtestBtn = new QPushButton(ClientUi);
+        STORtestBtn->setObjectName("STORtestBtn");
+        STORtestBtn->setGeometry(QRect(740, 150, 75, 24));
 
         retranslateUi(ClientUi);
 
@@ -127,9 +139,11 @@ public:
         PWDtestBtn->setText(QCoreApplication::translate("ClientUi", "PWD", nullptr));
         LISTtestBtn->setText(QCoreApplication::translate("ClientUi", "LIST", nullptr));
         PASVtestBtn->setText(QCoreApplication::translate("ClientUi", "PASV", nullptr));
-        serverPathLabel->setText(QString());
         MKDtestBtn->setText(QCoreApplication::translate("ClientUi", "MKD", nullptr));
         RMDtestBtn->setText(QCoreApplication::translate("ClientUi", "RMD", nullptr));
+        CWDTestBtn->setText(QCoreApplication::translate("ClientUi", "CWD", nullptr));
+        RETRtestBtn->setText(QCoreApplication::translate("ClientUi", "RETR", nullptr));
+        STORtestBtn->setText(QCoreApplication::translate("ClientUi", "STOR", nullptr));
     } // retranslateUi
 
 };

@@ -8,12 +8,14 @@
 #include<QRegularExpression>
 #include <QRegularExpressionMatch>
 #include"common.h"
-
+#include<QFileInfo>
 class Util {
 public:
     static QPair<QString,quint32> parsePasvResp(const QString& resp);
     static QVector<FtpFileInfo> parseFtpList(const QString& ftpList);
     static QString parsePath(const QString& path);
+    static QPair<QString,quint64> parseDownloadInfo(const QString& info);
+    static QString parseFileName(const QString& filePath);
 };
 
 

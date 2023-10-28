@@ -23,8 +23,7 @@ enum FtpCode {
     FTP_CONNECTION_ERROR=425,
     FTP_TIME_OUT=421,
     FTP_LIST_DIR=150,
-    FTP_PASV=227,
-    FTP_RECV_DIR=150
+    FTP_PASV=227
 };
 
 struct FtpResp {

@@ -18,9 +18,9 @@ QPair <QString, quint32> Util::parsePasvResp(const QString &resp) {
 QVector<FtpFileInfo> Util::parseFtpList(const QString &ftpList) {
     QVector<FtpFileInfo> fileList;
     QStringList lines=ftpList.split("\r\n",Qt::SkipEmptyParts);
-    QRegularExpression regex(R"(([d-])([r-][w-][x-][r-][w-][x-][r-][w-][x-])\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([A-Za-z][A-Za-z][A-Za-z])\s+(\d+)\s+(\d+:\d+)\s+(.*))");
+    QRegularExpression regex(R"(([d-])([r-][w-][x-][r-][w-][x-][r-][w-][x-])\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([A-Za-z][A-Za-z][A-Za-z])\s+(\d+)\s+(\d+:\d+|\d\d\d\d)\s+(.*))");
     for(const QString& line:lines){
-//        qDebug()<<line<<"\n";
+        qDebug()<<"line"<<line<<"\n";
         QRegularExpressionMatch match = regex.match(line);
         if(match.hasMatch()){
             FtpFileInfo fileInfo;
@@ -48,3 +48,30 @@ QString Util::parsePath(const QString &msg) {
     }
     return "";
 }
+
+QPair<QString, quint64> Util::parseDownloadInfo(const QString &info) {
+    qDebug()<<"info"<<info<<"\n";
+    QPair<QString,quint64> res{"",1};
+    QRegularExpression regex1(R"(for\s+(\/\S+))");
+    QRegularExpressionMatch match1=regex1.match(info);
+    if(match1.hasMatch()){
+        QString filePath=match1.captured(0);
+        filePath.remove(0,3);
+        filePath=filePath.trimmed();
+        res.first=filePath;
+    }
+    QRegularExpression regex2(R"(\((\d+)\s+bytes\))");
+    QRegularExpressionMatch match2=regex2.match(info);
+    if(match2.hasMatch()){
+        QString sizeStr=match2.captured(1);
+        quint64 size=sizeStr.toUInt();
+        res.second=size;
+    }
+    return res;
+}
+
+QString Util::parseFileName(const QString &filePath) {
+    QFileInfo fileInfo(filePath);
+    return fileInfo.fileName();
+}
+

@@ -214,19 +214,6 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="serverPathLabel">
-   <property name="geometry">
-    <rect>
-     <x>440</x>
-     <y>370</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
   <widget class="QPushButton" name="MKDtestBtn">
    <property name="geometry">
     <rect>
@@ -251,6 +238,55 @@
    </property>
    <property name="text">
     <string>RMD</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="CWDTestBtn">
+   <property name="geometry">
+    <rect>
+     <x>540</x>
+     <y>150</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>CWD</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="RETRtestBtn">
+   <property name="geometry">
+    <rect>
+     <x>640</x>
+     <y>150</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>RETR</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="serverPathBar">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>370</y>
+     <width>441</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="STORtestBtn">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>150</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>STOR</string>
    </property>
   </widget>
  </widget>
