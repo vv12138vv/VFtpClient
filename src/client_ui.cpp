@@ -27,11 +27,14 @@ void ClientUi::initSlots() {
     connect(ui->usernameInputBar, &QLineEdit::editingFinished, this, &ClientUi::onUsernameBarEdited);
     connect(ui->passwordInputBar, &QLineEdit::editingFinished, this, &ClientUi::onPasswordBarEdited);
     connect(client_->getLogger(), &Logger::newLog, this, &ClientUi::onNewLog);
-    connect(client_, &Client::fileTableUpdate, this, &ClientUi::onFileTableUpdate);
+    connect(client_, &Client::fileTableUpdate, this, &ClientUi::onServerFileTableUpdate);
     connect(client_, &Client::serverPathUpdate, this, &ClientUi::onServerPathUpdate);
     connect(ui->serverFileTable, &QTableWidget::cellClicked, this, &ClientUi::onServerFileTableCellClicked);
     connect(ui->serverFileTable, &QTableWidget::cellDoubleClicked, this, &ClientUi::onServerFileTableCell2Clicked);
-    connect(ui->STORtestBtn, &QPushButton::clicked, this, &ClientUi::onSTORtestBtnClicked);
+    connect(client_, &Client::clientPathUpdate, this, &ClientUi::onClientPathUpdate);
+    connect(this,&ClientUi::clientTableUpdate,this,&ClientUi::onClientFileTableUpdate);
+    connect(ui->clientFileTable,&QTableWidget::cellClicked,this,&ClientUi::onClientFileTableCellClicked);
+    connect(ui->clientFileTable,&QTableWidget::cellDoubleClicked,this,&ClientUi::onClientFileTableCell2Clicked);
     //for test
     connect(ui->PWDtestBtn, &QPushButton::clicked, this, &ClientUi::onPWDtestBtnClicked);
     connect(ui->LISTtestBtn, &QPushButton::clicked, this, &ClientUi::onLISTtestBtnClicked);
@@ -40,6 +43,7 @@ void ClientUi::initSlots() {
     connect(ui->RMDtestBtn, &QPushButton::clicked, this, &ClientUi::onRMDtestBtnClicked);
     connect(ui->CWDTestBtn, &QPushButton::clicked, this, &ClientUi::onCWDtestBtnClicked);
     connect(ui->RETRtestBtn, &QPushButton::clicked, this, &ClientUi::onRETRtestBtnClicked);
+    connect(ui->STORtestBtn, &QPushButton::clicked, this, &ClientUi::onSTORtestBtnClicked);
 }
 
 void ClientUi::onConnectBtnClicked() {
@@ -107,7 +111,7 @@ void ClientUi::onPASVtestBtnClicked() {
     client_->PASV();
 }
 
-void ClientUi::onFileTableUpdate(const QVector<FtpFileInfo> &fileInfoList) {
+void ClientUi::onServerFileTableUpdate(const QVector<FtpFileInfo> &fileInfoList) {
     ui->serverFileTable->setRowCount(fileInfoList.size() + 1);
     const quint32 col = 6;
     ui->serverFileTable->setColumnCount(col);
@@ -182,13 +186,83 @@ void ClientUi::onServerFileTableCell2Clicked(int row, int column) {
     if (typeItem->text() != "Folder") {
         return;
     }
-    nextPath_ = ui->serverPathBar->text() + '/' + item->text();
-    qDebug() << "nextPath:" << nextPath_ << '\n';
-    client_->CWD(nextPath_);
+    serverNextPath_ = ui->serverPathBar->text() + '/' + item->text();
+    qDebug() << "nextPath:" << serverNextPath_ << '\n';
+    client_->CWD(serverNextPath_);
 }
 
 void ClientUi::onSTORtestBtnClicked() {
     client_->STOR("wdnmd");
+}
+
+
+void ClientUi::onClientPathUpdate(const QString &path) {
+    ui->clientPathBar->setText(path);
+    client_->curClientPath_=path;
+    emit clientTableUpdate(path);
+}
+
+
+
+void ClientUi::onClientFileTableUpdate(const QString& path) {
+    QDir directory(path);
+    if (!directory.exists()) {
+        return;
+    }
+    QStringList folders = directory.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    QStringList files = directory.entryList(QDir::Files);
+    ui->clientFileTable->setRowCount(folders.size()+files.size()+1);
+    const quint32 col=4;
+    ui->clientFileTable->setColumnCount(col);
+    QStringList headerLabels = {"Name", "Type", "Size", "Time"};
+    ui->clientFileTable->setHorizontalHeaderLabels(headerLabels);
+    ui->clientFileTable->setItem(0, 0, new QTableWidgetItem(".."));
+    ui->clientFileTable->setItem(0, 1, new QTableWidgetItem("Folder"));
+    int row=1;
+    for(int i=0;i<folders.size();i++,row++){
+        QString dirPath=directory.absoluteFilePath(folders.at(i));
+        QFileInfo folderInfo(dirPath);
+        ui->clientFileTable->setItem(row,0,new QTableWidgetItem(folderInfo.fileName()));
+        ui->clientFileTable->setItem(row,1,new QTableWidgetItem("Folder"));
+        ui->clientFileTable->setItem(row,2,new QTableWidgetItem(nullptr));
+        ui->clientFileTable->setItem(row,3,new QTableWidgetItem(folderInfo.fileTime(QFile::FileModificationTime).toString()));
+    }
+
+    for(int i=0;i<files.size();i++,row++){
+        QString filePath=directory.absoluteFilePath(files.at(i));
+        QFileInfo fileInfo(filePath);
+        ui->clientFileTable->setItem(row,0,new QTableWidgetItem(fileInfo.fileName()));
+        ui->clientFileTable->setItem(row,1,new QTableWidgetItem("File"));
+        ui->clientFileTable->setItem(row,2,new QTableWidgetItem(QString::number(fileInfo.size())));
+        ui->clientFileTable->setItem(row,3,new QTableWidgetItem(fileInfo.fileTime(QFile::FileModificationTime).toString()));
+    }
+
+    ui->clientFileTable->resizeColumnsToContents();
+    ui->clientFileTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->clientFileTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->clientFileTable->horizontalHeader()->setStretchLastSection(true);
+    ui->clientFileTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+}
+
+void ClientUi::onClientFileTableCellClicked(int row, int column) {
+    qDebug()<<"single click"<<row<<":"<<column<<'\n';
+}
+
+void ClientUi::onClientFileTableCell2Clicked(int row, int column) {
+    auto item = ui->clientFileTable->item(row,column);
+    if(column!=0){
+        return;
+    }
+    auto typeItem=ui->clientFileTable->item(row,column+1);
+    if(typeItem->text()!="Folder"){
+        return;
+    }
+    QFileInfo folderInfo(client_->curClientPath_);
+    QString simplifiedPath=folderInfo.canonicalFilePath();
+    QString nextPath = simplifiedPath + '/' + item->text();
+    QFileInfo folderInfo2(nextPath);
+    nextPath=folderInfo2.canonicalFilePath();
+    emit onClientPathUpdate(nextPath);
 }
 
 

@@ -16,6 +16,7 @@ Client::Client(QObject *parent) : QObject(parent) {
     connect(dataSocket_, &QTcpSocket::disconnected, this, &Client::onDataSocketDisconnected);
     connect(dataSocket_, &QTcpSocket::readyRead, this, &Client::onDataSocketReadyRead);
     connect(dataSocket_, &QTcpSocket::bytesWritten, this, &Client::onDataSocketWritten);
+
 }
 
 Client::~Client() {
@@ -25,6 +26,12 @@ Client::~Client() {
 
 void Client::connectTo(const QHostAddress &host, quint16 port) {
     controlSocket_->connectToHost(host, port);
+    //初始化客户端路径
+    QStringList desktopPaths=QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
+    if(!desktopPaths.empty()){
+        curClientPath_=desktopPaths.first();
+        emit clientPathUpdate(curClientPath_);
+    }
 }
 
 
@@ -65,7 +72,6 @@ void Client::sendCmd() {
 Logger *Client::getLogger() {
     return logger_;
 }
-
 
 
 void Client::handleFtpResp(const FtpResp &ftpResp) {
@@ -117,9 +123,6 @@ void Client::handleFtpResp(const FtpResp &ftpResp) {
         }
         case FTP_PATHNAME_CREATED: {
             handle257(ftpResp);
-//            logger_->log("成功获取路径");
-//            QString path=qMove(Util::parsePath(ftpResp.statusMsg_));
-//            emit serverPathUpdate(path);
             break;
         }
         default: {
@@ -127,7 +130,6 @@ void Client::handleFtpResp(const FtpResp &ftpResp) {
         }
     }
 }
-
 
 
 void Client::onDataSocketConnected() {
@@ -139,13 +141,13 @@ void Client::onDataSocketDisconnected() {
 }
 
 void Client::onDataSocketReadyRead() {
-    QByteArray data=dataSocket_->readAll();
+    QByteArray data = dataSocket_->readAll();
 //    qDebug()<<"dataSocket readAll:"<<data<<'\n';
     dataReadBuffer_.append(qMove(data));
 //    qDebug()<<"dataReadBuffer_:"<<dataReadBuffer_<<'\n';
 //    qDebug()<<"dataReadBuffer size"<<dataReadBuffer_.size()<<'\n';
 //    qDebug()<<"ifStartList_:"<<ifStartList_<<"   ifListFinished_:"<<ifListFinished_<<"\n";
-//    if (ifStartTransfer_ && !ifTransferFinished_) {//传输文件
+//    if (ifStartReceiveTransfer_ && !ifReceiveTransferFinished_) {//传输文件
 //        QString savePath(R"(C:\Users\jgss9\Desktop\test.md)");
 //        QFile file(savePath);
 //        file.open(QIODevice::Append);
@@ -180,7 +182,7 @@ void Client::USER(const QString &username) {
 }
 
 void Client::PASS(const QString &password) {
-    QString cmd="PASS "+password+"\r\n";
+    QString cmd = "PASS " + password + "\r\n";
     controlSocket_->write(cmd.toUtf8());
 }
 
@@ -226,8 +228,8 @@ void Client::CWD(const QString &path) {
 }
 
 void Client::STOR(const QString &filePath) {
-    QString testFilePath="wallpaper2.jpg";
-    QString cmd="STOR "+testFilePath+"\r\n";
+    QString testFilePath = "wallpaper2.jpg";
+    QString cmd = "STOR " + testFilePath + "\r\n";
     controlSocket_->write(cmd.toUtf8());
 }
 
@@ -250,21 +252,23 @@ void Client::handle150(const FtpResp &ftpResp) {
     QString statusMsg = ftpResp.statusMsg_;
 //    qDebug()<<"statusMsg:"<<statusMsg<<'\n';
     if (statusMsg.contains("Opening BINARY mode data connection")) {
-        ifStartTransfer_ = true;
-        ifTransferFinished_ = false;
-        QPair<QString,quint64> downLoadInfo=Util::parseDownloadInfo(ftpResp.statusMsg_);
-        downloadSize_=downLoadInfo.second;
-        downloadFileName_=Util::parseFileName(downLoadInfo.first);
+        ifStartReceiveTransfer_ = true;
+        ifReceiveTransferFinished_ = false;
+        QPair<QString, quint64> downLoadInfo = Util::parseDownloadInfo(ftpResp.statusMsg_);
+        downloadSize_ = downLoadInfo.second;
+        downloadFileName_ = Util::parseFileName(downLoadInfo.first);
     } else if (statusMsg.contains("Here comes the directory listing")) {
-        qDebug()<<"update list state: startList"<<"\n";
+        qDebug() << "update list state: startList" << "\n";
         ifStartList_ = true;
         ifListFinished_ = false;
-    }else if(statusMsg.contains("Ok to send data")){
-        QString filePath="C:\\Users\\jgss9\\Desktop\\wallpaper2.jpg";
+    } else if (statusMsg.contains("Ok to send data")) {
+        ifStartSendTransfer_ = true;
+        ifSendTransferFinished_ = false;
+        QString filePath = "C:\\Users\\jgss9\\Desktop\\wallpaper2.jpg";
         QFile file(filePath);
         file.open(QIODevice::ReadOnly);
-        QByteArray data=file.readAll();
-        qDebug()<<"upload size"<<data.size()<<'\n';
+        QByteArray data = file.readAll();
+        qDebug() << "upload size" << data.size() << '\n';
         dataSocket_->write(data);
         dataSocket_->close();
     }
@@ -273,23 +277,28 @@ void Client::handle150(const FtpResp &ftpResp) {
 void Client::handle226(const FtpResp &ftpResp) {
     QString statusMsg = ftpResp.statusMsg_;
     if (statusMsg.contains("Transfer complete")) {
-        ifTransferFinished_ = true;
-        ifStartTransfer_ = false;
-        QString savePath(R"(C:\Users\jgss9\Desktop\)" + downloadFileName_);
-        qDebug()<<"savePath:"<<savePath<<'\n';
-        QFile file(savePath);
-        file.open(QIODevice::Append);
-        file.write(qMove(dataReadBuffer_.left(downloadSize_)));
-        dataReadBuffer_.remove(0,downloadSize_);
-        file.close();
-        qDebug()<<"dataBuffer size"<<dataReadBuffer_.size()<<'\n';
+        if (!ifReceiveTransferFinished_ && ifStartReceiveTransfer_) {
+            ifReceiveTransferFinished_ = true;
+            ifStartReceiveTransfer_ = false;
+            QString savePath(R"(C:\Users\jgss9\Desktop\)" + downloadFileName_);
+            qDebug() << "savePath:" << savePath << '\n';
+            QFile file(savePath);
+            file.open(QIODevice::Append);
+            file.write(qMove(dataReadBuffer_.left(downloadSize_)));
+            dataReadBuffer_.remove(0, downloadSize_);
+            file.close();
+            qDebug() << "dataBuffer size" << dataReadBuffer_.size() << '\n';
+        } else if (ifStartSendTransfer_ && !ifSendTransferFinished_) {
+            ifSendTransferFinished_ = true;
+            ifStartSendTransfer_ = false;
+        }
     } else if (statusMsg.contains("Directory send OK")) {
         ifListFinished_ = true;
         ifStartList_ = false;
-        QByteArray fileListData=dataReadBuffer_.left(dataReadBuffer_.size());
-        qDebug()<<"fileListData"<<fileListData<<'\n';
-        dataReadBuffer_.remove(0,dataReadBuffer_.size());
-        qDebug()<<"removed dataReadBuffer:"<<dataReadBuffer_.size()<<'\n';
+        QByteArray fileListData = dataReadBuffer_.left(dataReadBuffer_.size());
+        qDebug() << "fileListData" << fileListData << '\n';
+        dataReadBuffer_.remove(0, dataReadBuffer_.size());
+        qDebug() << "removed dataReadBuffer:" << dataReadBuffer_.size() << '\n';
         QString fileListStr(fileListData);
         auto fileInfoList = Util::parseFtpList(fileListStr);
         for (auto i: fileInfoList) {

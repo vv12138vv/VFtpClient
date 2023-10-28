@@ -9,7 +9,10 @@
 #include<QPointer>
 #include<QRegularExpression>
 #include<QDebug>
+#include<QDir>
+
 #include "client.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class ClientUi; }
 QT_END_NAMESPACE
@@ -24,33 +27,65 @@ private:
     quint16 targetPort_;
     QString username_;
     QString password_;
-    QString nextPath_;
+    QString serverNextPath_;
 public:
     explicit ClientUi(QWidget *parent = nullptr);
+
     void initSlots();
+
     ~ClientUi() override;
 
+signals:
+
+    void clientTableUpdate(const QString& path);
+
 public slots:
+
     void onConnectBtnClicked();
+
     void onLoginBtnClicked();
+
     void onPortBarEdited();
+
     void onHostBarEdited();
+
     void onUsernameBarEdited();
+
     void onPasswordBarEdited();
-    void onNewLog(const QString& logMsg);
-    void onFileTableUpdate(const QVector<FtpFileInfo>&);
-    void onServerPathUpdate(const QString&);
-    void onServerFileTableCellClicked(int row,int column);
-    void onServerFileTableCell2Clicked(int row,int column);
+
+    void onNewLog(const QString &logMsg);
+
+    void onServerFileTableUpdate(const QVector<FtpFileInfo> &);
+
+    void onServerPathUpdate(const QString &);
+
+    void onServerFileTableCellClicked(int row, int column);
+
+    void onServerFileTableCell2Clicked(int row, int column);
+
+    void onClientFileTableUpdate(const QString& path);
+
+    void onClientPathUpdate(const QString &);
+
+    void onClientFileTableCellClicked(int row,int column);
+
+    void onClientFileTableCell2Clicked(int row,int column);
 
 
     void onPWDtestBtnClicked();
+
     void onLISTtestBtnClicked();
+
     void onPASVtestBtnClicked();
+
     void onMKDtestBtnClicked();
+
     void onRMDtestBtnClicked();
+
     void onCWDtestBtnClicked();
+
     void onRETRtestBtnClicked();
+
     void onSTORtestBtnClicked();
 };
 

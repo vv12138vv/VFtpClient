@@ -12,6 +12,8 @@
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include<QFile>
+#include<QStandardPaths>
+
 #include"logger.h"
 #include"common.h"
 #include"util.h"
@@ -25,9 +27,12 @@ private:
     QPointer<Logger> logger_;
     QByteArray controlReadBuffer_;
     QByteArray dataReadBuffer_;
-    QString curServerPath_;
-    bool ifStartTransfer_{false};
-    bool ifTransferFinished_{false};
+
+    bool ifStartReceiveTransfer_{false};
+    bool ifReceiveTransferFinished_{false};
+    bool ifStartSendTransfer_{false};
+    bool ifSendTransferFinished_{false};
+
     bool ifStartList_{false};
     bool ifListFinished_{false};
     quint64 downloadSize_{0};
@@ -36,12 +41,15 @@ public:
     explicit Client(QObject *parent = nullptr);
 
     ~Client() override;
+    QString curServerPath_;
+    QString curClientPath_;
 
     void connectTo(const QHostAddress &, quint16);
 
     void sendCmd();
 
     Logger *getLogger();
+
 
     void USER(const QString &username);
 
@@ -61,7 +69,7 @@ public:
 
     void RETR(const QString &);
 
-    void STOR(const QString&);
+    void STOR(const QString &);
 
     void handleFtpResp(const FtpResp &);
 
@@ -73,12 +81,15 @@ public:
 
     void handle226(const FtpResp &ftpResp);
 
-    void handle425(const FtpResp& ftpResp);
+    void handle425(const FtpResp &ftpResp);
+
 signals:
 
     void fileTableUpdate(const QVector<FtpFileInfo> &);
 
     void serverPathUpdate(const QString &);
+
+    void clientPathUpdate(const QString &);
 
 public slots:
 

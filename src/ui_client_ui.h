@@ -45,12 +45,14 @@ public:
     QPushButton *RETRtestBtn;
     QLineEdit *serverPathBar;
     QPushButton *STORtestBtn;
+    QTableWidget *clientFileTable;
+    QLineEdit *clientPathBar;
 
     void setupUi(QWidget *ClientUi)
     {
         if (ClientUi->objectName().isEmpty())
             ClientUi->setObjectName("ClientUi");
-        ClientUi->resize(900, 750);
+        ClientUi->resize(1000, 750);
         connectBtn = new QPushButton(ClientUi);
         connectBtn->setObjectName("connectBtn");
         connectBtn->setGeometry(QRect(590, 20, 91, 31));
@@ -87,40 +89,46 @@ public:
         passwordInputBar->setGeometry(QRect(420, 70, 121, 21));
         systemMsgBrowser = new QTextBrowser(ClientUi);
         systemMsgBrowser->setObjectName("systemMsgBrowser");
-        systemMsgBrowser->setGeometry(QRect(440, 190, 441, 171));
+        systemMsgBrowser->setGeometry(QRect(530, 190, 441, 171));
         loginBtn = new QPushButton(ClientUi);
         loginBtn->setObjectName("loginBtn");
         loginBtn->setGeometry(QRect(590, 60, 91, 31));
         PWDtestBtn = new QPushButton(ClientUi);
         PWDtestBtn->setObjectName("PWDtestBtn");
-        PWDtestBtn->setGeometry(QRect(440, 110, 75, 24));
+        PWDtestBtn->setGeometry(QRect(560, 110, 75, 24));
         LISTtestBtn = new QPushButton(ClientUi);
         LISTtestBtn->setObjectName("LISTtestBtn");
-        LISTtestBtn->setGeometry(QRect(540, 110, 75, 24));
+        LISTtestBtn->setGeometry(QRect(660, 110, 75, 24));
         PASVtestBtn = new QPushButton(ClientUi);
         PASVtestBtn->setObjectName("PASVtestBtn");
-        PASVtestBtn->setGeometry(QRect(640, 110, 75, 24));
+        PASVtestBtn->setGeometry(QRect(760, 110, 75, 24));
         serverFileTable = new QTableWidget(ClientUi);
         serverFileTable->setObjectName("serverFileTable");
-        serverFileTable->setGeometry(QRect(440, 400, 441, 321));
+        serverFileTable->setGeometry(QRect(530, 400, 441, 321));
         MKDtestBtn = new QPushButton(ClientUi);
         MKDtestBtn->setObjectName("MKDtestBtn");
-        MKDtestBtn->setGeometry(QRect(740, 110, 75, 24));
+        MKDtestBtn->setGeometry(QRect(860, 110, 75, 24));
         RMDtestBtn = new QPushButton(ClientUi);
         RMDtestBtn->setObjectName("RMDtestBtn");
-        RMDtestBtn->setGeometry(QRect(440, 150, 75, 24));
+        RMDtestBtn->setGeometry(QRect(560, 150, 75, 24));
         CWDTestBtn = new QPushButton(ClientUi);
         CWDTestBtn->setObjectName("CWDTestBtn");
-        CWDTestBtn->setGeometry(QRect(540, 150, 75, 24));
+        CWDTestBtn->setGeometry(QRect(660, 150, 75, 24));
         RETRtestBtn = new QPushButton(ClientUi);
         RETRtestBtn->setObjectName("RETRtestBtn");
-        RETRtestBtn->setGeometry(QRect(640, 150, 75, 24));
+        RETRtestBtn->setGeometry(QRect(760, 150, 75, 24));
         serverPathBar = new QLineEdit(ClientUi);
         serverPathBar->setObjectName("serverPathBar");
-        serverPathBar->setGeometry(QRect(440, 370, 441, 22));
+        serverPathBar->setGeometry(QRect(530, 370, 441, 22));
         STORtestBtn = new QPushButton(ClientUi);
         STORtestBtn->setObjectName("STORtestBtn");
-        STORtestBtn->setGeometry(QRect(740, 150, 75, 24));
+        STORtestBtn->setGeometry(QRect(860, 150, 75, 24));
+        clientFileTable = new QTableWidget(ClientUi);
+        clientFileTable->setObjectName("clientFileTable");
+        clientFileTable->setGeometry(QRect(20, 400, 441, 321));
+        clientPathBar = new QLineEdit(ClientUi);
+        clientPathBar->setObjectName("clientPathBar");
+        clientPathBar->setGeometry(QRect(20, 370, 441, 22));
 
         retranslateUi(ClientUi);
 
