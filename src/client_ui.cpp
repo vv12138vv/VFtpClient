@@ -35,6 +35,8 @@ void ClientUi::initSlots() {
     connect(this,&ClientUi::clientTableUpdate,this,&ClientUi::onClientFileTableUpdate);
     connect(ui->clientFileTable,&QTableWidget::cellClicked,this,&ClientUi::onClientFileTableCellClicked);
     connect(ui->clientFileTable,&QTableWidget::cellDoubleClicked,this,&ClientUi::onClientFileTableCell2Clicked);
+    connect(ui->uploadBtn,&QPushButton::clicked,this,&ClientUi::onUploadBtnClicked);
+    connect(ui->downloadBtn,&QPushButton::clicked,this,&ClientUi::onDownloadBtnClicked);
     //for test
     connect(ui->PWDtestBtn, &QPushButton::clicked, this, &ClientUi::onPWDtestBtnClicked);
     connect(ui->LISTtestBtn, &QPushButton::clicked, this, &ClientUi::onLISTtestBtnClicked);
@@ -144,7 +146,7 @@ void ClientUi::onServerFileTableUpdate(const QVector<FtpFileInfo> &fileInfoList)
     ui->serverFileTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->serverFileTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->serverFileTable->horizontalHeader()->setStretchLastSection(true);
-    ui->serverFileTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->serverFileTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 }
 
 void ClientUi::onServerPathUpdate(const QString &path) {
@@ -173,8 +175,9 @@ void ClientUi::onRETRtestBtnClicked() {
 }
 
 void ClientUi::onServerFileTableCellClicked(int row, int column) {
-    auto item = ui->serverFileTable->item(row, column);
-//    qDebug() << "item text: " << item->text() << "\n";
+    selectedServerItem_.first=row;
+    selectedServerItem_.second=column;
+    qDebug()<<selectedServerItem_<<'\n';
 }
 
 void ClientUi::onServerFileTableCell2Clicked(int row, int column) {
@@ -189,6 +192,7 @@ void ClientUi::onServerFileTableCell2Clicked(int row, int column) {
     serverNextPath_ = ui->serverPathBar->text() + '/' + item->text();
     qDebug() << "nextPath:" << serverNextPath_ << '\n';
     client_->CWD(serverNextPath_);
+    client_->LIST();
 }
 
 void ClientUi::onSTORtestBtnClicked() {
@@ -241,11 +245,13 @@ void ClientUi::onClientFileTableUpdate(const QString& path) {
     ui->clientFileTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->clientFileTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->clientFileTable->horizontalHeader()->setStretchLastSection(true);
-    ui->clientFileTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->clientFileTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 }
 
 void ClientUi::onClientFileTableCellClicked(int row, int column) {
-    qDebug()<<"single click"<<row<<":"<<column<<'\n';
+    selectedClientItem_.first=row;
+    selectedClientItem_.second=column;
+    qDebug() << selectedClientItem_ << '\n';
 }
 
 void ClientUi::onClientFileTableCell2Clicked(int row, int column) {
@@ -263,6 +269,26 @@ void ClientUi::onClientFileTableCell2Clicked(int row, int column) {
     QFileInfo folderInfo2(nextPath);
     nextPath=folderInfo2.canonicalFilePath();
     emit onClientPathUpdate(nextPath);
+}
+
+void ClientUi::onUploadBtnClicked() {
+    auto item=ui->clientFileTable->item(selectedClientItem_.first, 0);
+    if(ui->clientFileTable->item(selectedClientItem_.first, 0 + 1)->text() == "Folder"){
+        return;
+    }
+    QString filePath=client_->curClientPath_+'/'+item->text();
+    client_->STOR(filePath);
+}
+
+void ClientUi::onDownloadBtnClicked() {
+    auto item=ui->serverFileTable->item(selectedServerItem_.first, 0);
+    if(ui->serverFileTable->item(selectedServerItem_.first, 0 + 1)->text() == "Folder"){
+        return;
+    }
+    QString filePath=client_->curServerPath_+'/'+item->text();
+//    qDebug()<<client_->curServerPath_<<'\n';
+//    qDebug()<<filePath<<'\n';
+    client_->RETR(filePath);
 }
 // Todo 选中文件,然后上传与下载
 

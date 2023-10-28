@@ -37,6 +37,7 @@ private:
     bool ifListFinished_{false};
     quint64 downloadSize_{0};
     QString downloadFileName_;
+    QString uploadFilePath_;
 public:
     explicit Client(QObject *parent = nullptr);
 

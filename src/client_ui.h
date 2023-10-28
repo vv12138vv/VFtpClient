@@ -28,6 +28,8 @@ private:
     QString username_;
     QString password_;
     QString serverNextPath_;
+    QPair<int,int> selectedClientItem_;
+    QPair<int,int> selectedServerItem_;
 public:
     explicit ClientUi(QWidget *parent = nullptr);
 
@@ -71,6 +73,8 @@ public slots:
 
     void onClientFileTableCell2Clicked(int row,int column);
 
+    void onUploadBtnClicked();
+    void onDownloadBtnClicked();
 
     void onPWDtestBtnClicked();
 

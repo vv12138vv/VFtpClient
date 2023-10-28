@@ -193,7 +193,9 @@ void Client::PWD() {
 
 void Client::LIST() {
     PWD();
-    PASV();
+    if(dataSocket_->state()!=QAbstractSocket::ConnectedState){
+        PASV();
+    }
     QString cmd = "LIST\r\n";
     controlSocket_->write(cmd.toUtf8());
 }
@@ -217,7 +219,7 @@ void Client::RMD(const QString &filePath) {
 
 void Client::RETR(const QString &filePath) {
     QString testFilePath = "/home/ftp/Up/wallpaper.jpg";
-    QString cmd = "RETR " + testFilePath + "\r\n";
+    QString cmd = "RETR " + filePath + "\r\n";
     controlSocket_->write(cmd.toUtf8());
 }
 
@@ -228,8 +230,9 @@ void Client::CWD(const QString &path) {
 }
 
 void Client::STOR(const QString &filePath) {
-    QString testFilePath = "wallpaper2.jpg";
-    QString cmd = "STOR " + testFilePath + "\r\n";
+    uploadFilePath_=filePath;
+    qDebug()<<"filePath"<<Util::parseFileName(uploadFilePath_)<<'\n';
+    QString cmd = "STOR " +Util::parseFileName(uploadFilePath_)+ "\r\n";
     controlSocket_->write(cmd.toUtf8());
 }
 
@@ -264,7 +267,7 @@ void Client::handle150(const FtpResp &ftpResp) {
     } else if (statusMsg.contains("Ok to send data")) {
         ifStartSendTransfer_ = true;
         ifSendTransferFinished_ = false;
-        QString filePath = "C:\\Users\\jgss9\\Desktop\\wallpaper2.jpg";
+        QString filePath = uploadFilePath_;
         QFile file(filePath);
         file.open(QIODevice::ReadOnly);
         QByteArray data = file.readAll();
@@ -280,17 +283,20 @@ void Client::handle226(const FtpResp &ftpResp) {
         if (!ifReceiveTransferFinished_ && ifStartReceiveTransfer_) {
             ifReceiveTransferFinished_ = true;
             ifStartReceiveTransfer_ = false;
-            QString savePath(R"(C:\Users\jgss9\Desktop\)" + downloadFileName_);
+//            QString savePath(R"(C:\Users\jgss9\Desktop\)" + downloadFileName_);
+            QString savePath(curClientPath_+'/'+downloadFileName_);
             qDebug() << "savePath:" << savePath << '\n';
             QFile file(savePath);
             file.open(QIODevice::Append);
             file.write(qMove(dataReadBuffer_.left(downloadSize_)));
             dataReadBuffer_.remove(0, downloadSize_);
             file.close();
+            logger_->log("文件下载成功");
             qDebug() << "dataBuffer size" << dataReadBuffer_.size() << '\n';
         } else if (ifStartSendTransfer_ && !ifSendTransferFinished_) {
             ifSendTransferFinished_ = true;
             ifStartSendTransfer_ = false;
+            logger_->log("文件上传成功");
         }
     } else if (statusMsg.contains("Directory send OK")) {
         ifListFinished_ = true;

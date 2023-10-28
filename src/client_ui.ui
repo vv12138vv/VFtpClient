@@ -309,6 +309,44 @@
     </rect>
    </property>
   </widget>
+  <widget class="QPushButton" name="uploadBtn">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>440</y>
+     <width>51</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Cascadia Mono SemiBold</family>
+     <pointsize>13</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>&gt;&gt;</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="downloadBtn">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>580</y>
+     <width>51</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Cascadia Mono SemiBold</family>
+     <pointsize>13</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>&lt;&lt;</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

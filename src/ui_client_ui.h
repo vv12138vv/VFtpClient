@@ -47,6 +47,8 @@ public:
     QPushButton *STORtestBtn;
     QTableWidget *clientFileTable;
     QLineEdit *clientPathBar;
+    QPushButton *uploadBtn;
+    QPushButton *downloadBtn;
 
     void setupUi(QWidget *ClientUi)
     {
@@ -129,6 +131,17 @@ public:
         clientPathBar = new QLineEdit(ClientUi);
         clientPathBar->setObjectName("clientPathBar");
         clientPathBar->setGeometry(QRect(20, 370, 441, 22));
+        uploadBtn = new QPushButton(ClientUi);
+        uploadBtn->setObjectName("uploadBtn");
+        uploadBtn->setGeometry(QRect(470, 440, 51, 51));
+        QFont font1;
+        font1.setFamilies({QString::fromUtf8("Cascadia Mono SemiBold")});
+        font1.setPointSize(13);
+        uploadBtn->setFont(font1);
+        downloadBtn = new QPushButton(ClientUi);
+        downloadBtn->setObjectName("downloadBtn");
+        downloadBtn->setGeometry(QRect(470, 580, 51, 51));
+        downloadBtn->setFont(font1);
 
         retranslateUi(ClientUi);
 
@@ -152,6 +165,8 @@ public:
         CWDTestBtn->setText(QCoreApplication::translate("ClientUi", "CWD", nullptr));
         RETRtestBtn->setText(QCoreApplication::translate("ClientUi", "RETR", nullptr));
         STORtestBtn->setText(QCoreApplication::translate("ClientUi", "STOR", nullptr));
+        uploadBtn->setText(QCoreApplication::translate("ClientUi", ">>", nullptr));
+        downloadBtn->setText(QCoreApplication::translate("ClientUi", "<<", nullptr));
     } // retranslateUi
 
 };

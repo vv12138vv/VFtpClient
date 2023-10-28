@@ -43,8 +43,12 @@ QString Util::parsePath(const QString &msg) {
     QRegularExpression regex("\"([^\"]*)\"");
     QRegularExpressionMatch match=regex.match(msg);
     if(match.hasMatch()){
-
-        return match.captured(0);
+        QString path=match.captured(0);
+        if (path.startsWith('\"') && path.endsWith('\"')) {
+            path = path.remove(0, 1);
+            path = path.remove(path.length() - 1, 1);
+            return path;
+        }
     }
     return "";
 }
