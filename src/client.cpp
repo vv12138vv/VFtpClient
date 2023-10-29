@@ -205,26 +205,27 @@ void Client::PASV() {
     controlSocket_->write(cmd.toUtf8());
 }
 
-void Client::MKD(const QString &dirName) {
-    QString testName = "testFolder";
-    QString cmd = "MKD " + testName + "\r\n";
+void Client::MKD(const QString &dirPath) {
+    QString cmd = "MKD " + dirPath + "\r\n";
     controlSocket_->write(cmd.toUtf8());
+    LIST();
 }
 
-void Client::RMD(const QString &filePath) {
-    QString testName = "testFolder";
-    QString cmd = "RMD " + testName + "\r\n";
+void Client::RMD(const QString &dirPath) {
+    QString cmd = "RMD " + dirPath + "\r\n";
     controlSocket_->write(cmd.toUtf8());
+    LIST();
 }
 
 void Client::RETR(const QString &filePath) {
-    QString testFilePath = "/home/ftp/Up/wallpaper.jpg";
+    if(dataSocket_->state()!=QAbstractSocket::ConnectedState){
+        PASV();
+    }
     QString cmd = "RETR " + filePath + "\r\n";
     controlSocket_->write(cmd.toUtf8());
 }
 
 void Client::CWD(const QString &path) {
-//    QString testPath = "/home/ftp/Up";
     QString cmd = "CWD " + path + "\r\n";
     controlSocket_->write(cmd.toUtf8());
 }
@@ -232,6 +233,9 @@ void Client::CWD(const QString &path) {
 void Client::STOR(const QString &filePath) {
     uploadFilePath_=filePath;
     qDebug()<<"filePath"<<Util::parseFileName(uploadFilePath_)<<'\n';
+    if(dataSocket_->state()!=QAbstractSocket::ConnectedState){
+        PASV();
+    }
     QString cmd = "STOR " +Util::parseFileName(uploadFilePath_)+ "\r\n";
     controlSocket_->write(cmd.toUtf8());
 }
@@ -283,7 +287,6 @@ void Client::handle226(const FtpResp &ftpResp) {
         if (!ifReceiveTransferFinished_ && ifStartReceiveTransfer_) {
             ifReceiveTransferFinished_ = true;
             ifStartReceiveTransfer_ = false;
-//            QString savePath(R"(C:\Users\jgss9\Desktop\)" + downloadFileName_);
             QString savePath(curClientPath_+'/'+downloadFileName_);
             qDebug() << "savePath:" << savePath << '\n';
             QFile file(savePath);

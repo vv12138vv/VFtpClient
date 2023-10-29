@@ -32,17 +32,22 @@ void ClientUi::initSlots() {
     connect(ui->serverFileTable, &QTableWidget::cellClicked, this, &ClientUi::onServerFileTableCellClicked);
     connect(ui->serverFileTable, &QTableWidget::cellDoubleClicked, this, &ClientUi::onServerFileTableCell2Clicked);
     connect(client_, &Client::clientPathUpdate, this, &ClientUi::onClientPathUpdate);
-    connect(this,&ClientUi::clientTableUpdate,this,&ClientUi::onClientFileTableUpdate);
-    connect(ui->clientFileTable,&QTableWidget::cellClicked,this,&ClientUi::onClientFileTableCellClicked);
-    connect(ui->clientFileTable,&QTableWidget::cellDoubleClicked,this,&ClientUi::onClientFileTableCell2Clicked);
-    connect(ui->uploadBtn,&QPushButton::clicked,this,&ClientUi::onUploadBtnClicked);
-    connect(ui->downloadBtn,&QPushButton::clicked,this,&ClientUi::onDownloadBtnClicked);
+    connect(this, &ClientUi::clientTableUpdate, this, &ClientUi::onClientFileTableUpdate);
+    connect(ui->clientFileTable, &QTableWidget::cellClicked, this, &ClientUi::onClientFileTableCellClicked);
+    connect(ui->clientFileTable, &QTableWidget::cellDoubleClicked, this, &ClientUi::onClientFileTableCell2Clicked);
+    connect(ui->uploadBtn, &QPushButton::clicked, this, &ClientUi::onUploadBtnClicked);
+    connect(ui->downloadBtn, &QPushButton::clicked, this, &ClientUi::onDownloadBtnClicked);
+    connect(ui->mkdirInputBar, &QLineEdit::editingFinished, this, &ClientUi::onMkDirBarEdited);
+    connect(ui->mkdirBtn, &QPushButton::clicked, this, &ClientUi::onMkDirBtnClicked);
+    connect(ui->rmdirInputBar, &QLineEdit::editingFinished, this, &ClientUi::onRmDirBarEdited);
+    connect(ui->rmdirBtn, &QPushButton::clicked, this, &ClientUi::onRmDirBtnClicked);
+
     //for test
     connect(ui->PWDtestBtn, &QPushButton::clicked, this, &ClientUi::onPWDtestBtnClicked);
     connect(ui->LISTtestBtn, &QPushButton::clicked, this, &ClientUi::onLISTtestBtnClicked);
     connect(ui->PASVtestBtn, &QPushButton::clicked, this, &ClientUi::onPASVtestBtnClicked);
-    connect(ui->MKDtestBtn, &QPushButton::clicked, this, &ClientUi::onMKDtestBtnClicked);
-    connect(ui->RMDtestBtn, &QPushButton::clicked, this, &ClientUi::onRMDtestBtnClicked);
+//    connect(ui->MKDtestBtn, &QPushButton::clicked, this, &ClientUi::onMKDtestBtnClicked);
+//    connect(ui->RMDtestBtn, &QPushButton::clicked, this, &ClientUi::onRMDtestBtnClicked);
     connect(ui->CWDTestBtn, &QPushButton::clicked, this, &ClientUi::onCWDtestBtnClicked);
     connect(ui->RETRtestBtn, &QPushButton::clicked, this, &ClientUi::onRETRtestBtnClicked);
     connect(ui->STORtestBtn, &QPushButton::clicked, this, &ClientUi::onSTORtestBtnClicked);
@@ -113,7 +118,7 @@ void ClientUi::onPASVtestBtnClicked() {
     client_->PASV();
 }
 
-void ClientUi::onServerFileTableUpdate(const QVector<FtpFileInfo> &fileInfoList) {
+void ClientUi::onServerFileTableUpdate(const QVector <FtpFileInfo> &fileInfoList) {
     ui->serverFileTable->setRowCount(fileInfoList.size() + 1);
     const quint32 col = 6;
     ui->serverFileTable->setColumnCount(col);
@@ -158,13 +163,13 @@ void ClientUi::onServerPathUpdate(const QString &path) {
     ui->serverPathBar->setText(outputPath);
 }
 
-void ClientUi::onMKDtestBtnClicked() {
-    client_->MKD("wdnmd");
-}
-
-void ClientUi::onRMDtestBtnClicked() {
-    client_->RMD("wdnmd");
-}
+//void ClientUi::onMKDtestBtnClicked() {
+//    client_->MKD("wdnmd");
+//}
+//
+//void ClientUi::onRMDtestBtnClicked() {
+//    client_->RMD("wdnmd");
+//}
 
 void ClientUi::onCWDtestBtnClicked() {
     client_->CWD("wdnmd");
@@ -175,9 +180,9 @@ void ClientUi::onRETRtestBtnClicked() {
 }
 
 void ClientUi::onServerFileTableCellClicked(int row, int column) {
-    selectedServerItem_.first=row;
-    selectedServerItem_.second=column;
-    qDebug()<<selectedServerItem_<<'\n';
+    selectedServerItem_.first = row;
+    selectedServerItem_.second = column;
+    qDebug() << selectedServerItem_ << '\n';
 }
 
 void ClientUi::onServerFileTableCell2Clicked(int row, int column) {
@@ -202,43 +207,44 @@ void ClientUi::onSTORtestBtnClicked() {
 
 void ClientUi::onClientPathUpdate(const QString &path) {
     ui->clientPathBar->setText(path);
-    client_->curClientPath_=path;
+    client_->curClientPath_ = path;
     emit clientTableUpdate(path);
 }
 
 
-
-void ClientUi::onClientFileTableUpdate(const QString& path) {
+void ClientUi::onClientFileTableUpdate(const QString &path) {
     QDir directory(path);
     if (!directory.exists()) {
         return;
     }
     QStringList folders = directory.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
     QStringList files = directory.entryList(QDir::Files);
-    ui->clientFileTable->setRowCount(folders.size()+files.size()+1);
-    const quint32 col=4;
+    ui->clientFileTable->setRowCount(folders.size() + files.size() + 1);
+    const quint32 col = 4;
     ui->clientFileTable->setColumnCount(col);
     QStringList headerLabels = {"Name", "Type", "Size", "Time"};
     ui->clientFileTable->setHorizontalHeaderLabels(headerLabels);
     ui->clientFileTable->setItem(0, 0, new QTableWidgetItem(".."));
     ui->clientFileTable->setItem(0, 1, new QTableWidgetItem("Folder"));
-    int row=1;
-    for(int i=0;i<folders.size();i++,row++){
-        QString dirPath=directory.absoluteFilePath(folders.at(i));
+    int row = 1;
+    for (int i = 0; i < folders.size(); i++, row++) {
+        QString dirPath = directory.absoluteFilePath(folders.at(i));
         QFileInfo folderInfo(dirPath);
-        ui->clientFileTable->setItem(row,0,new QTableWidgetItem(folderInfo.fileName()));
-        ui->clientFileTable->setItem(row,1,new QTableWidgetItem("Folder"));
-        ui->clientFileTable->setItem(row,2,new QTableWidgetItem(nullptr));
-        ui->clientFileTable->setItem(row,3,new QTableWidgetItem(folderInfo.fileTime(QFile::FileModificationTime).toString()));
+        ui->clientFileTable->setItem(row, 0, new QTableWidgetItem(folderInfo.fileName()));
+        ui->clientFileTable->setItem(row, 1, new QTableWidgetItem("Folder"));
+        ui->clientFileTable->setItem(row, 2, new QTableWidgetItem(nullptr));
+        ui->clientFileTable->setItem(row, 3,
+                                     new QTableWidgetItem(folderInfo.fileTime(QFile::FileModificationTime).toString()));
     }
 
-    for(int i=0;i<files.size();i++,row++){
-        QString filePath=directory.absoluteFilePath(files.at(i));
+    for (int i = 0; i < files.size(); i++, row++) {
+        QString filePath = directory.absoluteFilePath(files.at(i));
         QFileInfo fileInfo(filePath);
-        ui->clientFileTable->setItem(row,0,new QTableWidgetItem(fileInfo.fileName()));
-        ui->clientFileTable->setItem(row,1,new QTableWidgetItem("File"));
-        ui->clientFileTable->setItem(row,2,new QTableWidgetItem(QString::number(fileInfo.size())));
-        ui->clientFileTable->setItem(row,3,new QTableWidgetItem(fileInfo.fileTime(QFile::FileModificationTime).toString()));
+        ui->clientFileTable->setItem(row, 0, new QTableWidgetItem(fileInfo.fileName()));
+        ui->clientFileTable->setItem(row, 1, new QTableWidgetItem("File"));
+        ui->clientFileTable->setItem(row, 2, new QTableWidgetItem(QString::number(fileInfo.size())));
+        ui->clientFileTable->setItem(row, 3,
+                                     new QTableWidgetItem(fileInfo.fileTime(QFile::FileModificationTime).toString()));
     }
 
     ui->clientFileTable->resizeColumnsToContents();
@@ -249,48 +255,75 @@ void ClientUi::onClientFileTableUpdate(const QString& path) {
 }
 
 void ClientUi::onClientFileTableCellClicked(int row, int column) {
-    selectedClientItem_.first=row;
-    selectedClientItem_.second=column;
+    selectedClientItem_.first = row;
+    selectedClientItem_.second = column;
     qDebug() << selectedClientItem_ << '\n';
 }
 
 void ClientUi::onClientFileTableCell2Clicked(int row, int column) {
-    auto item = ui->clientFileTable->item(row,column);
-    if(column!=0){
+    auto item = ui->clientFileTable->item(row, column);
+    if (column != 0) {
         return;
     }
-    auto typeItem=ui->clientFileTable->item(row,column+1);
-    if(typeItem->text()!="Folder"){
+    auto typeItem = ui->clientFileTable->item(row, column + 1);
+    if (typeItem->text() != "Folder") {
         return;
     }
     QFileInfo folderInfo(client_->curClientPath_);
-    QString simplifiedPath=folderInfo.canonicalFilePath();
+    QString simplifiedPath = folderInfo.canonicalFilePath();
     QString nextPath = simplifiedPath + '/' + item->text();
     QFileInfo folderInfo2(nextPath);
-    nextPath=folderInfo2.canonicalFilePath();
+    nextPath = folderInfo2.canonicalFilePath();
     emit onClientPathUpdate(nextPath);
 }
 
 void ClientUi::onUploadBtnClicked() {
-    auto item=ui->clientFileTable->item(selectedClientItem_.first, 0);
-    if(ui->clientFileTable->item(selectedClientItem_.first, 0 + 1)->text() == "Folder"){
+    auto item = ui->clientFileTable->item(selectedClientItem_.first, 0);
+    if (ui->clientFileTable->item(selectedClientItem_.first, 0 + 1)->text() == "Folder") {
         return;
     }
-    QString filePath=client_->curClientPath_+'/'+item->text();
+    QString filePath = client_->curClientPath_ + '/' + item->text();
     client_->STOR(filePath);
 }
 
 void ClientUi::onDownloadBtnClicked() {
-    auto item=ui->serverFileTable->item(selectedServerItem_.first, 0);
-    if(ui->serverFileTable->item(selectedServerItem_.first, 0 + 1)->text() == "Folder"){
+    auto item = ui->serverFileTable->item(selectedServerItem_.first, 0);
+    if (ui->serverFileTable->item(selectedServerItem_.first, 0 + 1)->text() == "Folder") {
         return;
     }
-    QString filePath=client_->curServerPath_+'/'+item->text();
+    QString filePath = client_->curServerPath_ + '/' + item->text();
 //    qDebug()<<client_->curServerPath_<<'\n';
 //    qDebug()<<filePath<<'\n';
     client_->RETR(filePath);
 }
-// Todo 选中文件,然后上传与下载
+
+void ClientUi::onMkDirBarEdited() {
+    mkDirInput_ = ui->mkdirInputBar->text();
+}
+
+void ClientUi::onRmDirBarEdited() {
+    rmDirInput_ = ui->rmdirInputBar->text();
+}
+
+void ClientUi::onMkDirBtnClicked() {
+    QString folderPath = client_->curServerPath_ + '/' + mkDirInput_;
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Confirm", "确认执行该操作吗？", QMessageBox::Yes | QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        client_->MKD(folderPath);
+        ui->mkdirInputBar->clear();
+    }
+}
+
+void ClientUi::onRmDirBtnClicked() {
+    QString folderPath = client_->curServerPath_ + '/' + rmDirInput_;
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Confirm", "确认执行该操作吗？", QMessageBox::Yes | QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        client_->RMD(folderPath);
+        ui->rmdirInputBar->clear();
+    }
+}
 
 
 

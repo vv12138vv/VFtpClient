@@ -12,7 +12,7 @@
 #include<QDir>
 
 #include "client.h"
-
+#include<QMessageBox>
 QT_BEGIN_NAMESPACE
 namespace Ui { class ClientUi; }
 QT_END_NAMESPACE
@@ -30,6 +30,8 @@ private:
     QString serverNextPath_;
     QPair<int,int> selectedClientItem_;
     QPair<int,int> selectedServerItem_;
+    QString mkDirInput_;
+    QString rmDirInput_;
 public:
     explicit ClientUi(QWidget *parent = nullptr);
 
@@ -76,15 +78,21 @@ public slots:
     void onUploadBtnClicked();
     void onDownloadBtnClicked();
 
+    void onMkDirBarEdited();
+    void onRmDirBarEdited();
+    void onMkDirBtnClicked();
+    void onRmDirBtnClicked();
+
+
     void onPWDtestBtnClicked();
 
     void onLISTtestBtnClicked();
 
     void onPASVtestBtnClicked();
 
-    void onMKDtestBtnClicked();
-
-    void onRMDtestBtnClicked();
+//    void onMKDtestBtnClicked();
+//
+//    void onRMDtestBtnClicked();
 
     void onCWDtestBtnClicked();
 

@@ -145,8 +145,8 @@
   <widget class="QTextBrowser" name="systemMsgBrowser">
    <property name="geometry">
     <rect>
-     <x>530</x>
-     <y>190</y>
+     <x>10</x>
+     <y>120</y>
      <width>441</width>
      <height>171</height>
     </rect>
@@ -204,42 +204,6 @@
     <string>PASV</string>
    </property>
   </widget>
-  <widget class="QTableWidget" name="serverFileTable">
-   <property name="geometry">
-    <rect>
-     <x>530</x>
-     <y>400</y>
-     <width>441</width>
-     <height>321</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="MKDtestBtn">
-   <property name="geometry">
-    <rect>
-     <x>860</x>
-     <y>110</y>
-     <width>75</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>MKD</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="RMDtestBtn">
-   <property name="geometry">
-    <rect>
-     <x>560</x>
-     <y>150</y>
-     <width>75</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>RMD</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="CWDTestBtn">
    <property name="geometry">
     <rect>
@@ -266,16 +230,6 @@
     <string>RETR</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="serverPathBar">
-   <property name="geometry">
-    <rect>
-     <x>530</x>
-     <y>370</y>
-     <width>441</width>
-     <height>22</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QPushButton" name="STORtestBtn">
    <property name="geometry">
     <rect>
@@ -289,63 +243,123 @@
     <string>STOR</string>
    </property>
   </widget>
-  <widget class="QTableWidget" name="clientFileTable">
+  <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>400</y>
-     <width>441</width>
-     <height>321</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="clientPathBar">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
+     <x>10</x>
      <y>370</y>
-     <width>441</width>
-     <height>22</height>
+     <width>451</width>
+     <height>351</height>
     </rect>
    </property>
+   <layout class="QVBoxLayout" name="clientInfoLayout">
+    <item>
+     <widget class="QLineEdit" name="clientPathBar"/>
+    </item>
+    <item>
+     <widget class="QTableWidget" name="clientFileTable"/>
+    </item>
+   </layout>
   </widget>
-  <widget class="QPushButton" name="uploadBtn">
+  <widget class="QWidget" name="verticalLayoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>370</y>
+     <width>461</width>
+     <height>351</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="serverInfoLayout">
+    <item>
+     <widget class="QLineEdit" name="serverPathBar"/>
+    </item>
+    <item>
+     <widget class="QTableWidget" name="serverFileTable"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="verticalLayoutWidget_3">
    <property name="geometry">
     <rect>
      <x>470</x>
-     <y>440</y>
-     <width>51</width>
-     <height>51</height>
+     <y>430</y>
+     <width>77</width>
+     <height>241</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Cascadia Mono SemiBold</family>
-     <pointsize>13</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>&gt;&gt;</string>
-   </property>
+   <layout class="QVBoxLayout" name="loadBtnsLayout">
+    <item>
+     <widget class="QPushButton" name="uploadBtn">
+      <property name="font">
+       <font>
+        <family>Cascadia Mono SemiBold</family>
+        <pointsize>13</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>&gt;&gt;</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="downloadBtn">
+      <property name="font">
+       <font>
+        <family>Cascadia Mono SemiBold</family>
+        <pointsize>13</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>&lt;&lt;</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
-  <widget class="QPushButton" name="downloadBtn">
+  <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>470</x>
-     <y>580</y>
-     <width>51</width>
-     <height>51</height>
+     <x>520</x>
+     <y>330</y>
+     <width>231</width>
+     <height>31</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Cascadia Mono SemiBold</family>
-     <pointsize>13</pointsize>
-    </font>
+   <layout class="QHBoxLayout" name="mkdirLayout">
+    <item>
+     <widget class="QLineEdit" name="mkdirInputBar"/>
+    </item>
+    <item>
+     <widget class="QPushButton" name="mkdirBtn">
+      <property name="text">
+       <string>MKD</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>760</x>
+     <y>330</y>
+     <width>231</width>
+     <height>31</height>
+    </rect>
    </property>
-   <property name="text">
-    <string>&lt;&lt;</string>
-   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QLineEdit" name="rmdirInputBar"/>
+    </item>
+    <item>
+     <widget class="QPushButton" name="rmdirBtn">
+      <property name="text">
+       <string>RMD</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>
