@@ -204,45 +204,6 @@
     <string>PASV</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="CWDTestBtn">
-   <property name="geometry">
-    <rect>
-     <x>660</x>
-     <y>150</y>
-     <width>75</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>CWD</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="RETRtestBtn">
-   <property name="geometry">
-    <rect>
-     <x>760</x>
-     <y>150</y>
-     <width>75</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>RETR</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="STORtestBtn">
-   <property name="geometry">
-    <rect>
-     <x>860</x>
-     <y>150</y>
-     <width>75</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>STOR</string>
-   </property>
-  </widget>
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
@@ -257,7 +218,11 @@
      <widget class="QLineEdit" name="clientPathBar"/>
     </item>
     <item>
-     <widget class="QTableWidget" name="clientFileTable"/>
+     <widget class="QTableWidget" name="clientFileTable">
+      <property name="contextMenuPolicy">
+       <enum>Qt::CustomContextMenu</enum>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -275,43 +240,9 @@
      <widget class="QLineEdit" name="serverPathBar"/>
     </item>
     <item>
-     <widget class="QTableWidget" name="serverFileTable"/>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="verticalLayoutWidget_3">
-   <property name="geometry">
-    <rect>
-     <x>470</x>
-     <y>430</y>
-     <width>77</width>
-     <height>241</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="loadBtnsLayout">
-    <item>
-     <widget class="QPushButton" name="uploadBtn">
-      <property name="font">
-       <font>
-        <family>Cascadia Mono SemiBold</family>
-        <pointsize>13</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>&gt;&gt;</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="downloadBtn">
-      <property name="font">
-       <font>
-        <family>Cascadia Mono SemiBold</family>
-        <pointsize>13</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>&lt;&lt;</string>
+     <widget class="QTableWidget" name="serverFileTable">
+      <property name="contextMenuPolicy">
+       <enum>Qt::CustomContextMenu</enum>
       </property>
      </widget>
     </item>
@@ -360,6 +291,57 @@
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QPushButton" name="DELEtestBtn">
+   <property name="geometry">
+    <rect>
+     <x>850</x>
+     <y>110</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>DELE</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="uploadBtn">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>600</y>
+     <width>51</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Cascadia Mono SemiBold</family>
+     <pointsize>13</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>&gt;&gt;</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="downloadBtn">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>460</y>
+     <width>51</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Cascadia Mono SemiBold</family>
+     <pointsize>13</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>&lt;&lt;</string>
+   </property>
   </widget>
  </widget>
  <resources/>

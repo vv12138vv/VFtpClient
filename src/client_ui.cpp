@@ -13,6 +13,7 @@ ClientUi::ClientUi(QWidget *parent) :
     ui->setupUi(this);
     client_ = new Client(this);
     initSlots();
+
 }
 
 ClientUi::~ClientUi() {
@@ -41,16 +42,13 @@ void ClientUi::initSlots() {
     connect(ui->mkdirBtn, &QPushButton::clicked, this, &ClientUi::onMkDirBtnClicked);
     connect(ui->rmdirInputBar, &QLineEdit::editingFinished, this, &ClientUi::onRmDirBarEdited);
     connect(ui->rmdirBtn, &QPushButton::clicked, this, &ClientUi::onRmDirBtnClicked);
-
+    connect(ui->serverFileTable, &QTableWidget::customContextMenuRequested, this, &ClientUi::onShowServerContextMenu);
+    connect(ui->clientFileTable, &QTableWidget::customContextMenuRequested, this, &ClientUi::onShowClientContextMenu);
     //for test
     connect(ui->PWDtestBtn, &QPushButton::clicked, this, &ClientUi::onPWDtestBtnClicked);
     connect(ui->LISTtestBtn, &QPushButton::clicked, this, &ClientUi::onLISTtestBtnClicked);
     connect(ui->PASVtestBtn, &QPushButton::clicked, this, &ClientUi::onPASVtestBtnClicked);
-//    connect(ui->MKDtestBtn, &QPushButton::clicked, this, &ClientUi::onMKDtestBtnClicked);
-//    connect(ui->RMDtestBtn, &QPushButton::clicked, this, &ClientUi::onRMDtestBtnClicked);
-    connect(ui->CWDTestBtn, &QPushButton::clicked, this, &ClientUi::onCWDtestBtnClicked);
-    connect(ui->RETRtestBtn, &QPushButton::clicked, this, &ClientUi::onRETRtestBtnClicked);
-    connect(ui->STORtestBtn, &QPushButton::clicked, this, &ClientUi::onSTORtestBtnClicked);
+    connect(ui->DELEtestBtn, &QPushButton::clicked, this, &ClientUi::onDELEtestBtnClicked);
 }
 
 void ClientUi::onConnectBtnClicked() {
@@ -118,7 +116,7 @@ void ClientUi::onPASVtestBtnClicked() {
     client_->PASV();
 }
 
-void ClientUi::onServerFileTableUpdate(const QVector <FtpFileInfo> &fileInfoList) {
+void ClientUi::onServerFileTableUpdate(const QVector<FtpFileInfo> &fileInfoList) {
     ui->serverFileTable->setRowCount(fileInfoList.size() + 1);
     const quint32 col = 6;
     ui->serverFileTable->setColumnCount(col);
@@ -163,22 +161,6 @@ void ClientUi::onServerPathUpdate(const QString &path) {
     ui->serverPathBar->setText(outputPath);
 }
 
-//void ClientUi::onMKDtestBtnClicked() {
-//    client_->MKD("wdnmd");
-//}
-//
-//void ClientUi::onRMDtestBtnClicked() {
-//    client_->RMD("wdnmd");
-//}
-
-void ClientUi::onCWDtestBtnClicked() {
-    client_->CWD("wdnmd");
-}
-
-void ClientUi::onRETRtestBtnClicked() {
-    client_->RETR("wdnmd");
-}
-
 void ClientUi::onServerFileTableCellClicked(int row, int column) {
     selectedServerItem_.first = row;
     selectedServerItem_.second = column;
@@ -198,10 +180,6 @@ void ClientUi::onServerFileTableCell2Clicked(int row, int column) {
     qDebug() << "nextPath:" << serverNextPath_ << '\n';
     client_->CWD(serverNextPath_);
     client_->LIST();
-}
-
-void ClientUi::onSTORtestBtnClicked() {
-    client_->STOR("wdnmd");
 }
 
 
@@ -325,6 +303,56 @@ void ClientUi::onRmDirBtnClicked() {
     }
 }
 
+void ClientUi::onDELEtestBtnClicked() {
+    auto item = ui->serverFileTable->item(selectedServerItem_.first, 0);
+    if (ui->serverFileTable->item(selectedServerItem_.first, 0 + 1)->text() == "Folder") {
+        return;
+    }
+    QString filePath = client_->curServerPath_ + '/' + item->text();
+    client_->DELE(filePath);
+}
+
+void ClientUi::onShowServerContextMenu(const QPoint &pos) {
+    int row = ui->serverFileTable->rowAt(pos.y());
+    if (row == -1) {
+        return;
+    }
+//    qDebug()<<"clicked row is"<<row<<'\n';
+    selectedServerItem_ = {row, 0};
+    QMenu menu(this);
+    QPointer<QAction> openAction = menu.addAction("open");
+    QPointer<QAction> deleteAction = menu.addAction("delete");
+    QPointer<QAction> downloadAction = menu.addAction("download");
+
+    QAction *selectedAction = menu.exec(ui->serverFileTable->viewport()->mapToGlobal(pos));
+    if (selectedAction == openAction) {
+        qDebug() << "open" << "\n";
+        onServerFileTableCell2Clicked(row, 0);
+    } else if (selectedAction == deleteAction) {
+        onDELEtestBtnClicked();
+    } else if (selectedAction == downloadAction) {
+        onDownloadBtnClicked();
+    }
+}
+
+void ClientUi::onShowClientContextMenu(const QPoint &pos) {
+    int row = ui->clientFileTable->rowAt(pos.y());
+    if (row == -1) {
+        return;
+    }
+//    qDebug()<<"clicked row is"<<row<<'\n';
+    selectedClientItem_ = {row, 0};
+    QMenu menu(this);
+    QPointer<QAction> openAction = menu.addAction("open");
+    QPointer<QAction> uploadAction = menu.addAction("upload");
+
+    QAction *selectedAction = menu.exec(ui->clientFileTable->viewport()->mapToGlobal(pos));
+    if (selectedAction == openAction) {
+        onClientFileTableCell2Clicked(row,0);
+    } else if (selectedAction == uploadAction) {
+        onUploadBtnClicked();
+    }
+}
 
 
 

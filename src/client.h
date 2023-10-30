@@ -73,6 +73,8 @@ public:
 
     void STOR(const QString &);
 
+    void DELE(const QString&);
+
     void handleFtpResp(const FtpResp &);
 
     void handle257(const FtpResp &ftpResp);

@@ -240,6 +240,11 @@ void Client::STOR(const QString &filePath) {
     controlSocket_->write(cmd.toUtf8());
 }
 
+void Client::DELE(const QString &filePath) {
+    QString cmd="DELE "+filePath+"\r\n";
+    controlSocket_->write(cmd.toUtf8());
+}
+
 void Client::handle257(const FtpResp &ftpResp) {
     QString statusMsg = ftpResp.statusMsg_;
     QString path = qMove(Util::parsePath(ftpResp.statusMsg_));
@@ -307,7 +312,7 @@ void Client::handle226(const FtpResp &ftpResp) {
         QByteArray fileListData = dataReadBuffer_.left(dataReadBuffer_.size());
         qDebug() << "fileListData" << fileListData << '\n';
         dataReadBuffer_.remove(0, dataReadBuffer_.size());
-        qDebug() << "removed dataReadBuffer:" << dataReadBuffer_.size() << '\n';
+//        qDebug() << "removed dataReadBuffer:" << dataReadBuffer_.size() << '\n';
         QString fileListStr(fileListData);
         auto fileInfoList = Util::parseFtpList(fileListStr);
         for (auto i: fileInfoList) {

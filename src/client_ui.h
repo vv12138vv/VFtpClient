@@ -10,9 +10,11 @@
 #include<QRegularExpression>
 #include<QDebug>
 #include<QDir>
-
-#include "client.h"
 #include<QMessageBox>
+#include<QModelIndex>
+#include<QTableWidget>
+#include"context_menu.h"
+#include "client.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class ClientUi; }
 QT_END_NAMESPACE
@@ -90,15 +92,11 @@ public slots:
 
     void onPASVtestBtnClicked();
 
-//    void onMKDtestBtnClicked();
-//
-//    void onRMDtestBtnClicked();
 
-    void onCWDtestBtnClicked();
+    void onDELEtestBtnClicked();
 
-    void onRETRtestBtnClicked();
-
-    void onSTORtestBtnClicked();
+    void onShowServerContextMenu(const QPoint &pos);
+    void onShowClientContextMenu(const QPoint& pos);
 };
 
 

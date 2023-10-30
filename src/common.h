@@ -49,10 +49,7 @@ struct FtpFileInfo{
     QString time;
     QString name;
     void print(){
-
         char flag=isDir?'d':'-';
-//        QString str=flag+' '+permissions+' '+owner+' '+group+' '+QString::number(size)+' '+month+' '+day+' '+time+' '+name;
-//        qDebug()<<str<<"\n";
         qDebug()<<flag<<' '<<permissions<<' '<<owner<<' '<<group<<' '<<QString::number(size)<<' '<<month<<' '<<day<<' '<<time<<' '<<name<<'\n';
     }
 };

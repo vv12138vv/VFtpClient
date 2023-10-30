@@ -40,9 +40,6 @@ public:
     QPushButton *PWDtestBtn;
     QPushButton *LISTtestBtn;
     QPushButton *PASVtestBtn;
-    QPushButton *CWDTestBtn;
-    QPushButton *RETRtestBtn;
-    QPushButton *STORtestBtn;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *clientInfoLayout;
     QLineEdit *clientPathBar;
@@ -51,10 +48,6 @@ public:
     QVBoxLayout *serverInfoLayout;
     QLineEdit *serverPathBar;
     QTableWidget *serverFileTable;
-    QWidget *verticalLayoutWidget_3;
-    QVBoxLayout *loadBtnsLayout;
-    QPushButton *uploadBtn;
-    QPushButton *downloadBtn;
     QWidget *horizontalLayoutWidget;
     QHBoxLayout *mkdirLayout;
     QLineEdit *mkdirInputBar;
@@ -63,6 +56,9 @@ public:
     QHBoxLayout *horizontalLayout;
     QLineEdit *rmdirInputBar;
     QPushButton *rmdirBtn;
+    QPushButton *DELEtestBtn;
+    QPushButton *uploadBtn;
+    QPushButton *downloadBtn;
 
     void setupUi(QWidget *ClientUi)
     {
@@ -118,15 +114,6 @@ public:
         PASVtestBtn = new QPushButton(ClientUi);
         PASVtestBtn->setObjectName("PASVtestBtn");
         PASVtestBtn->setGeometry(QRect(760, 110, 75, 24));
-        CWDTestBtn = new QPushButton(ClientUi);
-        CWDTestBtn->setObjectName("CWDTestBtn");
-        CWDTestBtn->setGeometry(QRect(660, 150, 75, 24));
-        RETRtestBtn = new QPushButton(ClientUi);
-        RETRtestBtn->setObjectName("RETRtestBtn");
-        RETRtestBtn->setGeometry(QRect(760, 150, 75, 24));
-        STORtestBtn = new QPushButton(ClientUi);
-        STORtestBtn->setObjectName("STORtestBtn");
-        STORtestBtn->setGeometry(QRect(860, 150, 75, 24));
         verticalLayoutWidget = new QWidget(ClientUi);
         verticalLayoutWidget->setObjectName("verticalLayoutWidget");
         verticalLayoutWidget->setGeometry(QRect(10, 370, 451, 351));
@@ -140,6 +127,7 @@ public:
 
         clientFileTable = new QTableWidget(verticalLayoutWidget);
         clientFileTable->setObjectName("clientFileTable");
+        clientFileTable->setContextMenuPolicy(Qt::CustomContextMenu);
 
         clientInfoLayout->addWidget(clientFileTable);
 
@@ -156,29 +144,9 @@ public:
 
         serverFileTable = new QTableWidget(verticalLayoutWidget_2);
         serverFileTable->setObjectName("serverFileTable");
+        serverFileTable->setContextMenuPolicy(Qt::CustomContextMenu);
 
         serverInfoLayout->addWidget(serverFileTable);
-
-        verticalLayoutWidget_3 = new QWidget(ClientUi);
-        verticalLayoutWidget_3->setObjectName("verticalLayoutWidget_3");
-        verticalLayoutWidget_3->setGeometry(QRect(470, 430, 77, 241));
-        loadBtnsLayout = new QVBoxLayout(verticalLayoutWidget_3);
-        loadBtnsLayout->setObjectName("loadBtnsLayout");
-        loadBtnsLayout->setContentsMargins(0, 0, 0, 0);
-        uploadBtn = new QPushButton(verticalLayoutWidget_3);
-        uploadBtn->setObjectName("uploadBtn");
-        QFont font1;
-        font1.setFamilies({QString::fromUtf8("Cascadia Mono SemiBold")});
-        font1.setPointSize(13);
-        uploadBtn->setFont(font1);
-
-        loadBtnsLayout->addWidget(uploadBtn);
-
-        downloadBtn = new QPushButton(verticalLayoutWidget_3);
-        downloadBtn->setObjectName("downloadBtn");
-        downloadBtn->setFont(font1);
-
-        loadBtnsLayout->addWidget(downloadBtn);
 
         horizontalLayoutWidget = new QWidget(ClientUi);
         horizontalLayoutWidget->setObjectName("horizontalLayoutWidget");
@@ -212,6 +180,20 @@ public:
 
         horizontalLayout->addWidget(rmdirBtn);
 
+        DELEtestBtn = new QPushButton(ClientUi);
+        DELEtestBtn->setObjectName("DELEtestBtn");
+        DELEtestBtn->setGeometry(QRect(850, 110, 75, 24));
+        uploadBtn = new QPushButton(ClientUi);
+        uploadBtn->setObjectName("uploadBtn");
+        uploadBtn->setGeometry(QRect(470, 600, 51, 28));
+        QFont font1;
+        font1.setFamilies({QString::fromUtf8("Cascadia Mono SemiBold")});
+        font1.setPointSize(13);
+        uploadBtn->setFont(font1);
+        downloadBtn = new QPushButton(ClientUi);
+        downloadBtn->setObjectName("downloadBtn");
+        downloadBtn->setGeometry(QRect(470, 460, 51, 28));
+        downloadBtn->setFont(font1);
 
         retranslateUi(ClientUi);
 
@@ -230,13 +212,11 @@ public:
         PWDtestBtn->setText(QCoreApplication::translate("ClientUi", "PWD", nullptr));
         LISTtestBtn->setText(QCoreApplication::translate("ClientUi", "LIST", nullptr));
         PASVtestBtn->setText(QCoreApplication::translate("ClientUi", "PASV", nullptr));
-        CWDTestBtn->setText(QCoreApplication::translate("ClientUi", "CWD", nullptr));
-        RETRtestBtn->setText(QCoreApplication::translate("ClientUi", "RETR", nullptr));
-        STORtestBtn->setText(QCoreApplication::translate("ClientUi", "STOR", nullptr));
-        uploadBtn->setText(QCoreApplication::translate("ClientUi", ">>", nullptr));
-        downloadBtn->setText(QCoreApplication::translate("ClientUi", "<<", nullptr));
         mkdirBtn->setText(QCoreApplication::translate("ClientUi", "MKD", nullptr));
         rmdirBtn->setText(QCoreApplication::translate("ClientUi", "RMD", nullptr));
+        DELEtestBtn->setText(QCoreApplication::translate("ClientUi", "DELE", nullptr));
+        uploadBtn->setText(QCoreApplication::translate("ClientUi", ">>", nullptr));
+        downloadBtn->setText(QCoreApplication::translate("ClientUi", "<<", nullptr));
     } // retranslateUi
 
 };
