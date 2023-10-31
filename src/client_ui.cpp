@@ -9,7 +9,7 @@
 
 
 ClientUi::ClientUi(QWidget *parent) :
-        QWidget(parent), ui(new Ui::ClientUi) {
+        QMainWindow(parent), ui(new Ui::ClientUi) {
     ui->setupUi(this);
     client_ = new Client(this);
     initSlots();
@@ -40,24 +40,24 @@ void ClientUi::initSlots() {
     connect(ui->downloadBtn, &QPushButton::clicked, this, &ClientUi::onDownloadBtnClicked);
     connect(ui->mkdirInputBar, &QLineEdit::editingFinished, this, &ClientUi::onMkDirBarEdited);
     connect(ui->mkdirBtn, &QPushButton::clicked, this, &ClientUi::onMkDirBtnClicked);
-    connect(ui->rmdirInputBar, &QLineEdit::editingFinished, this, &ClientUi::onRmDirBarEdited);
-    connect(ui->rmdirBtn, &QPushButton::clicked, this, &ClientUi::onRmDirBtnClicked);
     connect(ui->serverFileTable, &QTableWidget::customContextMenuRequested, this, &ClientUi::onShowServerContextMenu);
     connect(ui->clientFileTable, &QTableWidget::customContextMenuRequested, this, &ClientUi::onShowClientContextMenu);
+    connect(client_,&Client::controlSocketConnected,this,&ClientUi::onControlSocketConnected);
+    connect(client_,&Client::controlSocketDisconnected,this,&ClientUi::onControlSocketDisconnected);
     //for test
-    connect(ui->PWDtestBtn, &QPushButton::clicked, this, &ClientUi::onPWDtestBtnClicked);
-    connect(ui->LISTtestBtn, &QPushButton::clicked, this, &ClientUi::onLISTtestBtnClicked);
-    connect(ui->PASVtestBtn, &QPushButton::clicked, this, &ClientUi::onPASVtestBtnClicked);
-    connect(ui->DELEtestBtn, &QPushButton::clicked, this, &ClientUi::onDELEtestBtnClicked);
+//    connect(ui->PWDtestBtn, &QPushButton::clicked, this, &ClientUi::onPWDtestBtnClicked);
+//    connect(ui->LISTtestBtn, &QPushButton::clicked, this, &ClientUi::onLISTtestBtnClicked);
+//    connect(ui->PASVtestBtn, &QPushButton::clicked, this, &ClientUi::onPASVtestBtnClicked);
+//    connect(ui->DELEtestBtn, &QPushButton::clicked, this, &ClientUi::onDeleteBtnClicked);
 }
 
 void ClientUi::onConnectBtnClicked() {
 //    if(targetHost_.isNull()||targetPort_==0||username_.isNull()||password_.isNull()){
 //        return;
 //    }
-    QHostAddress host("124.223.65.182");
-    quint32 port = 21;
-    client_->connectTo(host, port);
+//    QHostAddress host("124.223.65.182");
+//    quint32 port = 21;
+    client_->connectTo(targetHost_, targetPort_);
 }
 
 void ClientUi::onPortBarEdited() {
@@ -102,19 +102,20 @@ void ClientUi::onNewLog(const QString &logMsg) {
 
 void ClientUi::onLoginBtnClicked() {
     client_->USER(username_);
+    client_->PASS(password_);
 }
 
-void ClientUi::onPWDtestBtnClicked() {
-    client_->PWD();
-}
-
-void ClientUi::onLISTtestBtnClicked() {
-    client_->LIST();
-}
-
-void ClientUi::onPASVtestBtnClicked() {
-    client_->PASV();
-}
+//void ClientUi::onPWDtestBtnClicked() {
+//    client_->PWD();
+//}
+//
+//void ClientUi::onLISTtestBtnClicked() {
+//    client_->LIST();
+//}
+//
+//void ClientUi::onPASVtestBtnClicked() {
+//    client_->PASV();
+//}
 
 void ClientUi::onServerFileTableUpdate(const QVector<FtpFileInfo> &fileInfoList) {
     ui->serverFileTable->setRowCount(fileInfoList.size() + 1);
@@ -279,9 +280,9 @@ void ClientUi::onMkDirBarEdited() {
     mkDirInput_ = ui->mkdirInputBar->text();
 }
 
-void ClientUi::onRmDirBarEdited() {
-    rmDirInput_ = ui->rmdirInputBar->text();
-}
+//void ClientUi::onRmDirBarEdited() {
+//    rmDirInput_ = ui->rmdirInputBar->text();
+//}
 
 void ClientUi::onMkDirBtnClicked() {
     QString folderPath = client_->curServerPath_ + '/' + mkDirInput_;
@@ -299,17 +300,21 @@ void ClientUi::onRmDirBtnClicked() {
     reply = QMessageBox::question(this, "Confirm", "确认执行该操作吗？", QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::Yes) {
         client_->RMD(folderPath);
-        ui->rmdirInputBar->clear();
+//        ui->rmdirInputBar->clear();
     }
 }
 
-void ClientUi::onDELEtestBtnClicked() {
+void ClientUi::onDeleteBtnClicked() {
     auto item = ui->serverFileTable->item(selectedServerItem_.first, 0);
     if (ui->serverFileTable->item(selectedServerItem_.first, 0 + 1)->text() == "Folder") {
         return;
     }
     QString filePath = client_->curServerPath_ + '/' + item->text();
-    client_->DELE(filePath);
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Confirm", "确认执行该操作吗？", QMessageBox::Yes | QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        client_->DELE(filePath);
+    }
 }
 
 void ClientUi::onShowServerContextMenu(const QPoint &pos) {
@@ -317,41 +322,52 @@ void ClientUi::onShowServerContextMenu(const QPoint &pos) {
     if (row == -1) {
         return;
     }
-//    qDebug()<<"clicked row is"<<row<<'\n';
+
     selectedServerItem_ = {row, 0};
     QMenu menu(this);
-    QPointer<QAction> openAction = menu.addAction("open");
-    QPointer<QAction> deleteAction = menu.addAction("delete");
-    QPointer<QAction> downloadAction = menu.addAction("download");
-
-    QAction *selectedAction = menu.exec(ui->serverFileTable->viewport()->mapToGlobal(pos));
-    if (selectedAction == openAction) {
-        qDebug() << "open" << "\n";
-        onServerFileTableCell2Clicked(row, 0);
-    } else if (selectedAction == deleteAction) {
-        onDELEtestBtnClicked();
-    } else if (selectedAction == downloadAction) {
-        onDownloadBtnClicked();
+    auto item=ui->serverFileTable->item(row,1);
+    if(item->text()=="Folder"){
+        QPointer<QAction> openAction = menu.addAction("open");
+        QPointer<QAction> rmDirAction=menu.addAction("delete");
+        QAction *selectedAction = menu.exec(ui->serverFileTable->viewport()->mapToGlobal(pos));
+        if (selectedAction == openAction) {
+            qDebug() << "open" << "\n";
+            onServerFileTableCell2Clicked(row, 0);
+        }else if(selectedAction==rmDirAction){
+            qDebug()<<"rmdir"<<'\n';
+            auto item1 =ui->serverFileTable->item(row,0);
+            rmDirInput_=item1->text();
+            onRmDirBtnClicked();
+        }
+    }else if(item->text()=="File"){
+        QPointer<QAction> downloadAction=menu.addAction("download");
+        QPointer<QAction> deleteAction=menu.addAction("delete");
+        QAction *selectedAction = menu.exec(ui->serverFileTable->viewport()->mapToGlobal(pos));
+        if (selectedAction == downloadAction) {
+            qDebug() << "download" << "\n";
+            onDownloadBtnClicked();
+        }else if(selectedAction==deleteAction){
+            qDebug()<<"delete file"<<'\n';
+            onDeleteBtnClicked();
+        }
     }
+
+
 }
 
 void ClientUi::onShowClientContextMenu(const QPoint &pos) {
-    int row = ui->clientFileTable->rowAt(pos.y());
-    if (row == -1) {
-        return;
-    }
-//    qDebug()<<"clicked row is"<<row<<'\n';
-    selectedClientItem_ = {row, 0};
-    QMenu menu(this);
-    QPointer<QAction> openAction = menu.addAction("open");
-    QPointer<QAction> uploadAction = menu.addAction("upload");
+}
 
-    QAction *selectedAction = menu.exec(ui->clientFileTable->viewport()->mapToGlobal(pos));
-    if (selectedAction == openAction) {
-        onClientFileTableCell2Clicked(row,0);
-    } else if (selectedAction == uploadAction) {
-        onUploadBtnClicked();
-    }
+void ClientUi::onControlSocketConnected() {
+    QString connectionStatus("Connected");
+    ui->connectionStatus->setText(connectionStatus);
+    ui->connectionStatus->setStyleSheet("color: green;");
+}
+
+void ClientUi::onControlSocketDisconnected() {
+    QString connectionStatus("Disconnected");
+    ui->connectionStatus->setText(connectionStatus);
+    ui->connectionStatus->setStyleSheet("color: red;");
 }
 
 

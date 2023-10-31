@@ -11,15 +11,15 @@
 #include<QDebug>
 #include<QDir>
 #include<QMessageBox>
-#include<QModelIndex>
 #include<QTableWidget>
-#include"context_menu.h"
+#include<QMenu>
+#include<QMainWindow>
 #include "client.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class ClientUi; }
 QT_END_NAMESPACE
 
-class ClientUi : public QWidget {
+class ClientUi : public QMainWindow {
 Q_OBJECT
 
 private:
@@ -81,19 +81,21 @@ public slots:
     void onDownloadBtnClicked();
 
     void onMkDirBarEdited();
-    void onRmDirBarEdited();
+//    void onRmDirBarEdited();
     void onMkDirBtnClicked();
     void onRmDirBtnClicked();
+    void onControlSocketConnected();
+    void onControlSocketDisconnected();
 
 
-    void onPWDtestBtnClicked();
+//    void onPWDtestBtnClicked();
+//
+//    void onLISTtestBtnClicked();
+//
+//    void onPASVtestBtnClicked();
 
-    void onLISTtestBtnClicked();
 
-    void onPASVtestBtnClicked();
-
-
-    void onDELEtestBtnClicked();
+    void onDeleteBtnClicked();
 
     void onShowServerContextMenu(const QPoint &pos);
     void onShowClientContextMenu(const QPoint& pos);

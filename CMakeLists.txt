@@ -25,13 +25,10 @@ add_executable(VFtpClient
         src/logger.h
         src/logger.cpp
         src/common.h
-        src/ftp_status_handler.cpp
-        src/ftp_status_handler.h
         src/util.cpp
         src/util.h
-        src/util.h
-        src/context_menu.cpp
-        src/context_menu.h)
+        src/res.qrc
+)
 target_link_libraries(VFtpClient
         Qt::Core
         Qt::Gui

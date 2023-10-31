@@ -36,11 +36,11 @@ void Client::connectTo(const QHostAddress &host, quint16 port) {
 
 
 void Client::onControlSocketConnected() {
-//    logger_->log(QString("成功连接"));
+    emit controlSocketConnected();
 }
 
 void Client::onControlSocketDisconnected() {
-
+    emit controlSocketDisconnected();
 }
 
 void Client::onControlSocketReadyRead() {
@@ -54,7 +54,7 @@ void Client::onControlSocketReadyRead() {
         controlReadBuffer_.remove(0, respEnd + 2);
         respList.append(resp);
     }
-    for (auto &respStr: respList) {
+    for (auto &respStr: respList) {//处理每一条指令
         qDebug() << "respTest:" << respStr << "\n";
         FtpResp ftpResp(respStr);
         handleFtpResp(ftpResp);
@@ -62,12 +62,8 @@ void Client::onControlSocketReadyRead() {
 }
 
 void Client::onControlSocketWritten() {
-//    logger_->log(QString("命令成功发送"));
 }
 
-void Client::sendCmd() {
-
-}
 
 Logger *Client::getLogger() {
     return logger_;
@@ -77,7 +73,6 @@ Logger *Client::getLogger() {
 void Client::handleFtpResp(const FtpResp &ftpResp) {
     switch (ftpResp.statusCode_) {
         case FTP_NEED_PASSWORD: {
-            PASS("vv12138vv");
             break;
         }
         case FTP_PASV: {
@@ -93,6 +88,7 @@ void Client::handleFtpResp(const FtpResp &ftpResp) {
         }
         case FTP_LOGIN_SUCCESS: {
             logger_->log("登录成功");
+            LIST();
             break;
         }
         case FTP_LOGIN_INCORRECT: {
@@ -113,12 +109,12 @@ void Client::handleFtpResp(const FtpResp &ftpResp) {
         }
         case FTP_FILE_ACTION_COMPLETED: {
             handle226(ftpResp);
-            logger_->log("文件操作成功");
+//            logger_->log("文件操作成功");
             break;
         }
         case FTP_LIST_DIR: {
             handle150(ftpResp);
-            logger_->log("成功获取文件目录");
+//            logger_->log("成功获取文件目录");
             break;
         }
         case FTP_PATHNAME_CREATED: {
@@ -142,34 +138,7 @@ void Client::onDataSocketDisconnected() {
 
 void Client::onDataSocketReadyRead() {
     QByteArray data = dataSocket_->readAll();
-//    qDebug()<<"dataSocket readAll:"<<data<<'\n';
     dataReadBuffer_.append(qMove(data));
-//    qDebug()<<"dataReadBuffer_:"<<dataReadBuffer_<<'\n';
-//    qDebug()<<"dataReadBuffer size"<<dataReadBuffer_.size()<<'\n';
-//    qDebug()<<"ifStartList_:"<<ifStartList_<<"   ifListFinished_:"<<ifListFinished_<<"\n";
-//    if (ifStartReceiveTransfer_ && !ifReceiveTransferFinished_) {//传输文件
-//        QString savePath(R"(C:\Users\jgss9\Desktop\test.md)");
-//        QFile file(savePath);
-//        file.open(QIODevice::Append);
-//        static int repeat = 0;
-//        while (dataSocket_->bytesAvailable()) {
-//            QByteArray data = dataSocket_->readAll();
-//            qDebug() << "size" << data.size() << "\n";
-//            file.write(data);
-//            repeat += 1;
-//            qDebug() << "repeat:" << repeat << "\n";
-//        }
-//    } else if (ifStartList_ && !ifListFinished_) {//传输文件列表
-//        qDebug()<<"fileList"<<"\n";
-//        QByteArray fileListData=dataReadBuffer_.left(dataReadBuffer_.size());
-//        dataReadBuffer_.remove(0,dataReadBuffer_.size());
-//        QString fileListStr(fileListData);
-//        auto fileInfoList = Util::parseFtpList(fileListStr);
-//        for (auto i: fileInfoList) {
-//            i.print();
-//        }
-//        emit fileTableUpdate(fileInfoList);
-//    }
 }
 
 void Client::onDataSocketWritten() {
@@ -262,7 +231,6 @@ void Client::handle550(const FtpResp &ftpResp) {
 
 void Client::handle150(const FtpResp &ftpResp) {
     QString statusMsg = ftpResp.statusMsg_;
-//    qDebug()<<"statusMsg:"<<statusMsg<<'\n';
     if (statusMsg.contains("Opening BINARY mode data connection")) {
         ifStartReceiveTransfer_ = true;
         ifReceiveTransferFinished_ = false;
@@ -304,6 +272,7 @@ void Client::handle226(const FtpResp &ftpResp) {
         } else if (ifStartSendTransfer_ && !ifSendTransferFinished_) {
             ifSendTransferFinished_ = true;
             ifStartSendTransfer_ = false;
+            LIST();
             logger_->log("文件上传成功");
         }
     } else if (statusMsg.contains("Directory send OK")) {

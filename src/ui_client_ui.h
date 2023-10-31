@@ -10,6 +10,7 @@
 #define UI_CLIENT_UI_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
@@ -37,9 +38,6 @@ public:
     QLineEdit *passwordInputBar;
     QTextBrowser *systemMsgBrowser;
     QPushButton *loginBtn;
-    QPushButton *PWDtestBtn;
-    QPushButton *LISTtestBtn;
-    QPushButton *PASVtestBtn;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *clientInfoLayout;
     QLineEdit *clientPathBar;
@@ -52,19 +50,18 @@ public:
     QHBoxLayout *mkdirLayout;
     QLineEdit *mkdirInputBar;
     QPushButton *mkdirBtn;
-    QWidget *horizontalLayoutWidget_2;
-    QHBoxLayout *horizontalLayout;
-    QLineEdit *rmdirInputBar;
-    QPushButton *rmdirBtn;
-    QPushButton *DELEtestBtn;
     QPushButton *uploadBtn;
     QPushButton *downloadBtn;
+    QLabel *connectionStatusLabel;
+    QLabel *connectionStatus;
 
     void setupUi(QWidget *ClientUi)
     {
         if (ClientUi->objectName().isEmpty())
             ClientUi->setObjectName("ClientUi");
         ClientUi->resize(1000, 750);
+        QIcon icon(QIcon::fromTheme(QString::fromUtf8("applications-games")));
+        ClientUi->setWindowIcon(icon);
         connectBtn = new QPushButton(ClientUi);
         connectBtn->setObjectName("connectBtn");
         connectBtn->setGeometry(QRect(590, 20, 91, 31));
@@ -87,14 +84,14 @@ public:
         portInputBar->setGeometry(QRect(420, 30, 121, 21));
         usernameLabel = new QLabel(ClientUi);
         usernameLabel->setObjectName("usernameLabel");
-        usernameLabel->setGeometry(QRect(60, 60, 81, 31));
+        usernameLabel->setGeometry(QRect(60, 70, 81, 21));
         usernameLabel->setFont(font);
         usernameInputBar = new QLineEdit(ClientUi);
         usernameInputBar->setObjectName("usernameInputBar");
         usernameInputBar->setGeometry(QRect(150, 70, 121, 21));
         passwordLabe = new QLabel(ClientUi);
         passwordLabe->setObjectName("passwordLabe");
-        passwordLabe->setGeometry(QRect(320, 70, 91, 31));
+        passwordLabe->setGeometry(QRect(320, 70, 81, 21));
         passwordLabe->setFont(font);
         passwordInputBar = new QLineEdit(ClientUi);
         passwordInputBar->setObjectName("passwordInputBar");
@@ -104,16 +101,7 @@ public:
         systemMsgBrowser->setGeometry(QRect(10, 120, 441, 171));
         loginBtn = new QPushButton(ClientUi);
         loginBtn->setObjectName("loginBtn");
-        loginBtn->setGeometry(QRect(590, 60, 91, 31));
-        PWDtestBtn = new QPushButton(ClientUi);
-        PWDtestBtn->setObjectName("PWDtestBtn");
-        PWDtestBtn->setGeometry(QRect(560, 110, 75, 24));
-        LISTtestBtn = new QPushButton(ClientUi);
-        LISTtestBtn->setObjectName("LISTtestBtn");
-        LISTtestBtn->setGeometry(QRect(660, 110, 75, 24));
-        PASVtestBtn = new QPushButton(ClientUi);
-        PASVtestBtn->setObjectName("PASVtestBtn");
-        PASVtestBtn->setGeometry(QRect(760, 110, 75, 24));
+        loginBtn->setGeometry(QRect(590, 70, 91, 31));
         verticalLayoutWidget = new QWidget(ClientUi);
         verticalLayoutWidget->setObjectName("verticalLayoutWidget");
         verticalLayoutWidget->setGeometry(QRect(10, 370, 451, 351));
@@ -150,7 +138,7 @@ public:
 
         horizontalLayoutWidget = new QWidget(ClientUi);
         horizontalLayoutWidget->setObjectName("horizontalLayoutWidget");
-        horizontalLayoutWidget->setGeometry(QRect(520, 330, 231, 31));
+        horizontalLayoutWidget->setGeometry(QRect(650, 330, 231, 31));
         mkdirLayout = new QHBoxLayout(horizontalLayoutWidget);
         mkdirLayout->setObjectName("mkdirLayout");
         mkdirLayout->setContentsMargins(0, 0, 0, 0);
@@ -164,25 +152,6 @@ public:
 
         mkdirLayout->addWidget(mkdirBtn);
 
-        horizontalLayoutWidget_2 = new QWidget(ClientUi);
-        horizontalLayoutWidget_2->setObjectName("horizontalLayoutWidget_2");
-        horizontalLayoutWidget_2->setGeometry(QRect(760, 330, 231, 31));
-        horizontalLayout = new QHBoxLayout(horizontalLayoutWidget_2);
-        horizontalLayout->setObjectName("horizontalLayout");
-        horizontalLayout->setContentsMargins(0, 0, 0, 0);
-        rmdirInputBar = new QLineEdit(horizontalLayoutWidget_2);
-        rmdirInputBar->setObjectName("rmdirInputBar");
-
-        horizontalLayout->addWidget(rmdirInputBar);
-
-        rmdirBtn = new QPushButton(horizontalLayoutWidget_2);
-        rmdirBtn->setObjectName("rmdirBtn");
-
-        horizontalLayout->addWidget(rmdirBtn);
-
-        DELEtestBtn = new QPushButton(ClientUi);
-        DELEtestBtn->setObjectName("DELEtestBtn");
-        DELEtestBtn->setGeometry(QRect(850, 110, 75, 24));
         uploadBtn = new QPushButton(ClientUi);
         uploadBtn->setObjectName("uploadBtn");
         uploadBtn->setGeometry(QRect(470, 600, 51, 28));
@@ -194,6 +163,21 @@ public:
         downloadBtn->setObjectName("downloadBtn");
         downloadBtn->setGeometry(QRect(470, 460, 51, 28));
         downloadBtn->setFont(font1);
+        connectionStatusLabel = new QLabel(ClientUi);
+        connectionStatusLabel->setObjectName("connectionStatusLabel");
+        connectionStatusLabel->setGeometry(QRect(730, 20, 121, 31));
+        QFont font2;
+        font2.setFamilies({QString::fromUtf8("Cascadia Code")});
+        font2.setPointSize(8);
+        connectionStatusLabel->setFont(font2);
+        connectionStatus = new QLabel(ClientUi);
+        connectionStatus->setObjectName("connectionStatus");
+        connectionStatus->setGeometry(QRect(850, 20, 101, 31));
+        QFont font3;
+        font3.setFamilies({QString::fromUtf8("Cascadia Code")});
+        font3.setPointSize(10);
+        connectionStatus->setFont(font3);
+        connectionStatus->setStyleSheet(QString::fromUtf8("color: red;"));
 
         retranslateUi(ClientUi);
 
@@ -202,21 +186,18 @@ public:
 
     void retranslateUi(QWidget *ClientUi)
     {
-        ClientUi->setWindowTitle(QCoreApplication::translate("ClientUi", "ClientUi", nullptr));
+        ClientUi->setWindowTitle(QCoreApplication::translate("ClientUi", "VFtp", nullptr));
         connectBtn->setText(QCoreApplication::translate("ClientUi", "Connect", nullptr));
         hostLabel->setText(QCoreApplication::translate("ClientUi", "Host\357\274\232", nullptr));
         portLabel->setText(QCoreApplication::translate("ClientUi", "Port\357\274\232", nullptr));
         usernameLabel->setText(QCoreApplication::translate("ClientUi", "Username:", nullptr));
         passwordLabe->setText(QCoreApplication::translate("ClientUi", "Password:", nullptr));
         loginBtn->setText(QCoreApplication::translate("ClientUi", "Login", nullptr));
-        PWDtestBtn->setText(QCoreApplication::translate("ClientUi", "PWD", nullptr));
-        LISTtestBtn->setText(QCoreApplication::translate("ClientUi", "LIST", nullptr));
-        PASVtestBtn->setText(QCoreApplication::translate("ClientUi", "PASV", nullptr));
         mkdirBtn->setText(QCoreApplication::translate("ClientUi", "MKD", nullptr));
-        rmdirBtn->setText(QCoreApplication::translate("ClientUi", "RMD", nullptr));
-        DELEtestBtn->setText(QCoreApplication::translate("ClientUi", "DELE", nullptr));
         uploadBtn->setText(QCoreApplication::translate("ClientUi", ">>", nullptr));
         downloadBtn->setText(QCoreApplication::translate("ClientUi", "<<", nullptr));
+        connectionStatusLabel->setText(QCoreApplication::translate("ClientUi", "Connection Status\357\274\232", nullptr));
+        connectionStatus->setText(QCoreApplication::translate("ClientUi", "Disconnected", nullptr));
     } // retranslateUi
 
 };

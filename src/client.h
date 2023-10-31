@@ -48,7 +48,6 @@ public:
 
     void connectTo(const QHostAddress &, quint16);
 
-    void sendCmd();
 
     Logger *getLogger();
 
@@ -95,6 +94,8 @@ signals:
 
     void clientPathUpdate(const QString &);
 
+    void controlSocketConnected();
+    void controlSocketDisconnected();
 public slots:
 
     void onControlSocketConnected();

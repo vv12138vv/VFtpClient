@@ -11,7 +11,10 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>ClientUi</string>
+   <string>VFtp</string>
+  </property>
+  <property name="windowIcon">
+   <iconset theme="applications-games"/>
   </property>
   <widget class="QPushButton" name="connectBtn">
    <property name="geometry">
@@ -88,9 +91,9 @@
    <property name="geometry">
     <rect>
      <x>60</x>
-     <y>60</y>
+     <y>70</y>
      <width>81</width>
-     <height>31</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="font">
@@ -118,8 +121,8 @@
     <rect>
      <x>320</x>
      <y>70</y>
-     <width>91</width>
-     <height>31</height>
+     <width>81</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="font">
@@ -156,52 +159,13 @@
    <property name="geometry">
     <rect>
      <x>590</x>
-     <y>60</y>
+     <y>70</y>
      <width>91</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
     <string>Login</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="PWDtestBtn">
-   <property name="geometry">
-    <rect>
-     <x>560</x>
-     <y>110</y>
-     <width>75</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>PWD</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="LISTtestBtn">
-   <property name="geometry">
-    <rect>
-     <x>660</x>
-     <y>110</y>
-     <width>75</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>LIST</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="PASVtestBtn">
-   <property name="geometry">
-    <rect>
-     <x>760</x>
-     <y>110</y>
-     <width>75</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>PASV</string>
    </property>
   </widget>
   <widget class="QWidget" name="verticalLayoutWidget">
@@ -251,7 +215,7 @@
   <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>520</x>
+     <x>650</x>
      <y>330</y>
      <width>231</width>
      <height>31</height>
@@ -269,41 +233,6 @@
      </widget>
     </item>
    </layout>
-  </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget_2">
-   <property name="geometry">
-    <rect>
-     <x>760</x>
-     <y>330</y>
-     <width>231</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <widget class="QLineEdit" name="rmdirInputBar"/>
-    </item>
-    <item>
-     <widget class="QPushButton" name="rmdirBtn">
-      <property name="text">
-       <string>RMD</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QPushButton" name="DELEtestBtn">
-   <property name="geometry">
-    <rect>
-     <x>850</x>
-     <y>110</y>
-     <width>75</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>DELE</string>
-   </property>
   </widget>
   <widget class="QPushButton" name="uploadBtn">
    <property name="geometry">
@@ -343,7 +272,50 @@
     <string>&lt;&lt;</string>
    </property>
   </widget>
+  <widget class="QLabel" name="connectionStatusLabel">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>20</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Cascadia Code</family>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Connection Status：</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="connectionStatus">
+   <property name="geometry">
+    <rect>
+     <x>850</x>
+     <y>20</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Cascadia Code</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: red;</string>
+   </property>
+   <property name="text">
+    <string>Disconnected</string>
+   </property>
+  </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
  <connections/>
 </ui>
