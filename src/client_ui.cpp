@@ -13,7 +13,6 @@ ClientUi::ClientUi(QWidget *parent) :
     ui->setupUi(this);
     client_ = new Client(this);
     initSlots();
-
 }
 
 ClientUi::~ClientUi() {

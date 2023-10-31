@@ -13,8 +13,8 @@
   <property name="windowTitle">
    <string>VFtp</string>
   </property>
-  <property name="windowIcon">
-   <iconset theme="applications-games"/>
+  <property name="windowOpacity">
+   <double>1.000000000000000</double>
   </property>
   <widget class="QPushButton" name="connectBtn">
    <property name="geometry">
@@ -314,8 +314,6 @@
    </property>
   </widget>
  </widget>
- <resources>
-  <include location="res.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

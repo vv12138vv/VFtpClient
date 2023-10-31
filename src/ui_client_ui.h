@@ -60,8 +60,11 @@ public:
         if (ClientUi->objectName().isEmpty())
             ClientUi->setObjectName("ClientUi");
         ClientUi->resize(1000, 750);
-        QIcon icon(QIcon::fromTheme(QString::fromUtf8("applications-games")));
+        QIcon icon;
+        icon.addFile(QString::fromUtf8("../../../favicon.ico"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8("../../../favicon.ico"), QSize(), QIcon::Normal, QIcon::On);
         ClientUi->setWindowIcon(icon);
+        ClientUi->setWindowOpacity(1.000000000000000);
         connectBtn = new QPushButton(ClientUi);
         connectBtn->setObjectName("connectBtn");
         connectBtn->setGeometry(QRect(590, 20, 91, 31));
