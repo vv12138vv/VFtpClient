@@ -13,6 +13,7 @@
 #include <QRegularExpressionMatch>
 #include<QFile>
 #include<QStandardPaths>
+#include<QThread>
 
 #include"logger.h"
 #include"common.h"
@@ -96,6 +97,7 @@ signals:
 
     void controlSocketConnected();
     void controlSocketDisconnected();
+    void startWorking();
 public slots:
 
     void onControlSocketConnected();

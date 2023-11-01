@@ -6,17 +6,18 @@
 
 Client::Client(QObject *parent) : QObject(parent) {
     logger_ = new Logger(this);
+
     controlSocket_ = new QTcpSocket(this);
     connect(controlSocket_, &QTcpSocket::connected, this, &Client::onControlSocketConnected);
     connect(controlSocket_, &QTcpSocket::disconnected, this, &Client::onControlSocketDisconnected);
     connect(controlSocket_, &QTcpSocket::readyRead, this, &Client::onControlSocketReadyRead);
     connect(controlSocket_, &QTcpSocket::bytesWritten, this, &Client::onControlSocketWritten);
+
     dataSocket_ = new QTcpSocket(this);
     connect(dataSocket_, &QTcpSocket::connected, this, &Client::onDataSocketConnected);
     connect(dataSocket_, &QTcpSocket::disconnected, this, &Client::onDataSocketDisconnected);
     connect(dataSocket_, &QTcpSocket::readyRead, this, &Client::onDataSocketReadyRead);
     connect(dataSocket_, &QTcpSocket::bytesWritten, this, &Client::onDataSocketWritten);
-
 }
 
 Client::~Client() {
@@ -237,6 +238,7 @@ void Client::handle150(const FtpResp &ftpResp) {
         QPair<QString, quint64> downLoadInfo = Util::parseDownloadInfo(ftpResp.statusMsg_);
         downloadSize_ = downLoadInfo.second;
         downloadFileName_ = Util::parseFileName(downLoadInfo.first);
+
     } else if (statusMsg.contains("Here comes the directory listing")) {
         qDebug() << "update list state: startList" << "\n";
         ifStartList_ = true;
