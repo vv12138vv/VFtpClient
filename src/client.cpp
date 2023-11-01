@@ -11,12 +11,17 @@ Client::Client(QObject *parent) : QObject(parent) {
     connect(controlSocket_, &QTcpSocket::disconnected, this, &Client::onControlSocketDisconnected);
     connect(controlSocket_, &QTcpSocket::readyRead, this, &Client::onControlSocketReadyRead);
     connect(controlSocket_, &QTcpSocket::bytesWritten, this, &Client::onControlSocketWritten);
-    dataSocket_ = new QTcpSocket(this);
-    connect(dataSocket_, &QTcpSocket::connected, this, &Client::onDataSocketConnected);
-    connect(dataSocket_, &QTcpSocket::disconnected, this, &Client::onDataSocketDisconnected);
-    connect(dataSocket_, &QTcpSocket::readyRead, this, &Client::onDataSocketReadyRead);
-    connect(dataSocket_, &QTcpSocket::bytesWritten, this, &Client::onDataSocketWritten);
-
+    taskQueue_=new TaskQueue();
+    dataWorker_=new Worker(taskQueue_);
+    QThread workerThread;
+    dataWorker_->moveToThread(&workerThread);
+    connect(this,&Client::startWorking,dataWorker_,&Worker::startWorking);
+    emit startWorking();
+//    dataSocket_ = new QTcpSocket(this);
+//    connect(dataSocket_, &QTcpSocket::connected, this, &Client::onDataSocketConnected);
+//    connect(dataSocket_, &QTcpSocket::disconnected, this, &Client::onDataSocketDisconnected);
+//    connect(dataSocket_, &QTcpSocket::readyRead, this, &Client::onDataSocketReadyRead);
+//    connect(dataSocket_, &QTcpSocket::bytesWritten, this, &Client::onDataSocketWritten);
 }
 
 Client::~Client() {

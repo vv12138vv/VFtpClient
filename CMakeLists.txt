@@ -30,6 +30,8 @@ add_executable(VFtpClient
         src/res.qrc
         src/task.cpp
         src/task.h
+        src/worker.cpp
+        src/worker.h
 )
 target_link_libraries(VFtpClient
         Qt::Core

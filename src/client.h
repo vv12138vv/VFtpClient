@@ -13,11 +13,13 @@
 #include <QRegularExpressionMatch>
 #include<QFile>
 #include<QStandardPaths>
+#include<QThread>
 
+#include"task.h"
 #include"logger.h"
 #include"common.h"
 #include"util.h"
-
+#include"worker.h"
 class Client : public QObject {
 Q_OBJECT
 
@@ -27,7 +29,8 @@ private:
     QPointer<Logger> logger_;
     QByteArray controlReadBuffer_;
     QByteArray dataReadBuffer_;
-
+    QPointer<TaskQueue> taskQueue_;
+    QPointer<Worker> dataWorker_;
     bool ifStartReceiveTransfer_{false};
     bool ifReceiveTransferFinished_{false};
     bool ifStartSendTransfer_{false};
@@ -95,7 +98,10 @@ signals:
     void clientPathUpdate(const QString &);
 
     void controlSocketConnected();
+
     void controlSocketDisconnected();
+
+    void startWorking();
 public slots:
 
     void onControlSocketConnected();
