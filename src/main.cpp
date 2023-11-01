@@ -7,10 +7,9 @@ int main(int argc, char *argv[]) {
     clientUi.setFixedSize(1000,750);
     clientUi.setWindowTitle("VFtp");
     QPixmap image;
-    bool success=image.load("C:/Users/jgss9/Desktop/favicon.ico");
-    qDebug()<<"success:"<<success<<'\n';
-    QIcon icon(image);
-    clientUi.setWindowIcon(icon);
+    image.load(":/res/V.png");
+    QIcon windowIcon(image);
+    clientUi.setWindowIcon(windowIcon);
     clientUi.show();
     return QApplication::exec();
 }

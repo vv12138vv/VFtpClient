@@ -10,7 +10,6 @@
 #define UI_CLIENT_UI_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
@@ -60,14 +59,11 @@ public:
         if (ClientUi->objectName().isEmpty())
             ClientUi->setObjectName("ClientUi");
         ClientUi->resize(1000, 750);
-        QIcon icon;
-        icon.addFile(QString::fromUtf8("../../../favicon.ico"), QSize(), QIcon::Normal, QIcon::Off);
-        icon.addFile(QString::fromUtf8("../../../favicon.ico"), QSize(), QIcon::Normal, QIcon::On);
-        ClientUi->setWindowIcon(icon);
         ClientUi->setWindowOpacity(1.000000000000000);
         connectBtn = new QPushButton(ClientUi);
         connectBtn->setObjectName("connectBtn");
         connectBtn->setGeometry(QRect(590, 20, 91, 31));
+        connectBtn->setCursor(QCursor(Qt::PointingHandCursor));
         hostLabel = new QLabel(ClientUi);
         hostLabel->setObjectName("hostLabel");
         hostLabel->setGeometry(QRect(100, 30, 51, 31));
@@ -99,12 +95,14 @@ public:
         passwordInputBar = new QLineEdit(ClientUi);
         passwordInputBar->setObjectName("passwordInputBar");
         passwordInputBar->setGeometry(QRect(420, 70, 121, 21));
+        passwordInputBar->setEchoMode(QLineEdit::Password);
         systemMsgBrowser = new QTextBrowser(ClientUi);
         systemMsgBrowser->setObjectName("systemMsgBrowser");
-        systemMsgBrowser->setGeometry(QRect(10, 120, 441, 171));
+        systemMsgBrowser->setGeometry(QRect(10, 140, 451, 181));
         loginBtn = new QPushButton(ClientUi);
         loginBtn->setObjectName("loginBtn");
         loginBtn->setGeometry(QRect(590, 70, 91, 31));
+        loginBtn->setCursor(QCursor(Qt::PointingHandCursor));
         verticalLayoutWidget = new QWidget(ClientUi);
         verticalLayoutWidget->setObjectName("verticalLayoutWidget");
         verticalLayoutWidget->setGeometry(QRect(10, 370, 451, 351));
@@ -152,6 +150,7 @@ public:
 
         mkdirBtn = new QPushButton(horizontalLayoutWidget);
         mkdirBtn->setObjectName("mkdirBtn");
+        mkdirBtn->setCursor(QCursor(Qt::PointingHandCursor));
 
         mkdirLayout->addWidget(mkdirBtn);
 
@@ -162,10 +161,12 @@ public:
         font1.setFamilies({QString::fromUtf8("Cascadia Mono SemiBold")});
         font1.setPointSize(13);
         uploadBtn->setFont(font1);
+        uploadBtn->setCursor(QCursor(Qt::PointingHandCursor));
         downloadBtn = new QPushButton(ClientUi);
         downloadBtn->setObjectName("downloadBtn");
         downloadBtn->setGeometry(QRect(470, 460, 51, 28));
         downloadBtn->setFont(font1);
+        downloadBtn->setCursor(QCursor(Qt::PointingHandCursor));
         connectionStatusLabel = new QLabel(ClientUi);
         connectionStatusLabel->setObjectName("connectionStatusLabel");
         connectionStatusLabel->setGeometry(QRect(730, 20, 121, 31));

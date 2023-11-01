@@ -288,6 +288,7 @@ void Client::handle226(const FtpResp &ftpResp) {
             i.print();
         }
         emit fileTableUpdate(fileInfoList);
+        logger_->log("文件列表更新成功");
     }
 }
 
