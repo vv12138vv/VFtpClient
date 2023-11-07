@@ -13,8 +13,9 @@
 #include <QRegularExpressionMatch>
 #include<QFile>
 #include<QStandardPaths>
-#include<QThread>
+#include<QMutex>
 
+#include"thread.h"
 #include"logger.h"
 #include"common.h"
 #include"util.h"
@@ -28,6 +29,9 @@ private:
     QPointer<Logger> logger_;
     QByteArray controlReadBuffer_;
     QByteArray dataReadBuffer_;
+    QMutex mutex_;
+    QWaitCondition cv_;
+    Thread *workerThread_;
 
     bool ifStartReceiveTransfer_{false};
     bool ifReceiveTransferFinished_{false};
@@ -44,6 +48,7 @@ public:
     explicit Client(QObject *parent = nullptr);
 
     ~Client() override;
+
     QString curServerPath_;
     QString curClientPath_;
 
@@ -73,7 +78,7 @@ public:
 
     void STOR(const QString &);
 
-    void DELE(const QString&);
+    void DELE(const QString &);
 
     void handleFtpResp(const FtpResp &);
 
@@ -87,6 +92,8 @@ public:
 
     void handle425(const FtpResp &ftpResp);
 
+    void handle250(const FtpResp &ftpResp);
+
 signals:
 
     void fileTableUpdate(const QVector<FtpFileInfo> &);
@@ -96,8 +103,11 @@ signals:
     void clientPathUpdate(const QString &);
 
     void controlSocketConnected();
+
     void controlSocketDisconnected();
+
     void startWorking();
+
 public slots:
 
     void onControlSocketConnected();

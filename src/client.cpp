@@ -18,19 +18,26 @@ Client::Client(QObject *parent) : QObject(parent) {
     connect(dataSocket_, &QTcpSocket::disconnected, this, &Client::onDataSocketDisconnected);
     connect(dataSocket_, &QTcpSocket::readyRead, this, &Client::onDataSocketReadyRead);
     connect(dataSocket_, &QTcpSocket::bytesWritten, this, &Client::onDataSocketWritten);
+
+    workerThread_ = new Thread(&dataReadBuffer_, dataSocket_, &mutex_, &cv_);
+    workerThread_->start();
 }
 
 Client::~Client() {
+    delete logger_;
     delete controlSocket_;
     delete dataSocket_;
+    workerThread_->quit();
+    workerThread_->wait();
+    delete workerThread_;
 }
 
 void Client::connectTo(const QHostAddress &host, quint16 port) {
     controlSocket_->connectToHost(host, port);
     //初始化客户端路径
-    QStringList desktopPaths=QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
-    if(!desktopPaths.empty()){
-        curClientPath_=desktopPaths.first();
+    QStringList desktopPaths = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
+    if (!desktopPaths.empty()) {
+        curClientPath_ = desktopPaths.first();
         emit clientPathUpdate(curClientPath_);
     }
 }
@@ -122,6 +129,10 @@ void Client::handleFtpResp(const FtpResp &ftpResp) {
             handle257(ftpResp);
             break;
         }
+        case FTP_COMMAND_OK:{
+            handle250(ftpResp);
+            break;
+        }
         default: {
             break;
         }
@@ -138,8 +149,7 @@ void Client::onDataSocketDisconnected() {
 }
 
 void Client::onDataSocketReadyRead() {
-    QByteArray data = dataSocket_->readAll();
-    dataReadBuffer_.append(qMove(data));
+    cv_.notify_one();
 }
 
 void Client::onDataSocketWritten() {
@@ -163,7 +173,7 @@ void Client::PWD() {
 
 void Client::LIST() {
     PWD();
-    if(dataSocket_->state()!=QAbstractSocket::ConnectedState){
+    if (dataSocket_->state() != QAbstractSocket::ConnectedState) {
         PASV();
     }
     QString cmd = "LIST\r\n";
@@ -188,7 +198,7 @@ void Client::RMD(const QString &dirPath) {
 }
 
 void Client::RETR(const QString &filePath) {
-    if(dataSocket_->state()!=QAbstractSocket::ConnectedState){
+    if (dataSocket_->state() != QAbstractSocket::ConnectedState) {
         PASV();
     }
     QString cmd = "RETR " + filePath + "\r\n";
@@ -201,17 +211,17 @@ void Client::CWD(const QString &path) {
 }
 
 void Client::STOR(const QString &filePath) {
-    uploadFilePath_=filePath;
-    qDebug()<<"filePath"<<Util::parseFileName(uploadFilePath_)<<'\n';
-    if(dataSocket_->state()!=QAbstractSocket::ConnectedState){
+    uploadFilePath_ = filePath;
+    qDebug() << "filePath" << Util::parseFileName(uploadFilePath_) << '\n';
+    if (dataSocket_->state() != QAbstractSocket::ConnectedState) {
         PASV();
     }
-    QString cmd = "STOR " +Util::parseFileName(uploadFilePath_)+ "\r\n";
+    QString cmd = "STOR " + Util::parseFileName(uploadFilePath_) + "\r\n";
     controlSocket_->write(cmd.toUtf8());
 }
 
 void Client::DELE(const QString &filePath) {
-    QString cmd="DELE "+filePath+"\r\n";
+    QString cmd = "DELE " + filePath + "\r\n";
     controlSocket_->write(cmd.toUtf8());
 }
 
@@ -231,6 +241,7 @@ void Client::handle550(const FtpResp &ftpResp) {
 }
 
 void Client::handle150(const FtpResp &ftpResp) {
+    QMutexLocker locker(&mutex_);
     QString statusMsg = ftpResp.statusMsg_;
     if (statusMsg.contains("Opening BINARY mode data connection")) {
         ifStartReceiveTransfer_ = true;
@@ -238,7 +249,7 @@ void Client::handle150(const FtpResp &ftpResp) {
         QPair<QString, quint64> downLoadInfo = Util::parseDownloadInfo(ftpResp.statusMsg_);
         downloadSize_ = downLoadInfo.second;
         downloadFileName_ = Util::parseFileName(downLoadInfo.first);
-
+        logger_->log("开始下载文件:"+downloadFileName_);
     } else if (statusMsg.contains("Here comes the directory listing")) {
         qDebug() << "update list state: startList" << "\n";
         ifStartList_ = true;
@@ -262,7 +273,7 @@ void Client::handle226(const FtpResp &ftpResp) {
         if (!ifReceiveTransferFinished_ && ifStartReceiveTransfer_) {
             ifReceiveTransferFinished_ = true;
             ifStartReceiveTransfer_ = false;
-            QString savePath(curClientPath_+'/'+downloadFileName_);
+            QString savePath(curClientPath_ + '/' + downloadFileName_);
             qDebug() << "savePath:" << savePath << '\n';
             QFile file(savePath);
             file.open(QIODevice::Append);
@@ -270,7 +281,7 @@ void Client::handle226(const FtpResp &ftpResp) {
             dataReadBuffer_.remove(0, downloadSize_);
             file.close();
             logger_->log("文件下载成功");
-            qDebug() << "dataBuffer size" << dataReadBuffer_.size() << '\n';
+//            qDebug() << "dataBuffer size" << dataReadBuffer_.size() << '\n';
         } else if (ifStartSendTransfer_ && !ifSendTransferFinished_) {
             ifSendTransferFinished_ = true;
             ifStartSendTransfer_ = false;
@@ -283,7 +294,6 @@ void Client::handle226(const FtpResp &ftpResp) {
         QByteArray fileListData = dataReadBuffer_.left(dataReadBuffer_.size());
         qDebug() << "fileListData" << fileListData << '\n';
         dataReadBuffer_.remove(0, dataReadBuffer_.size());
-//        qDebug() << "removed dataReadBuffer:" << dataReadBuffer_.size() << '\n';
         QString fileListStr(fileListData);
         auto fileInfoList = Util::parseFtpList(fileListStr);
         for (auto i: fileInfoList) {
@@ -296,4 +306,11 @@ void Client::handle226(const FtpResp &ftpResp) {
 
 void Client::handle425(const FtpResp &ftpResp) {
 
+}
+
+void Client::handle250(const FtpResp &ftpResp) {
+    QString statusMag=ftpResp.statusMsg_;
+    if(statusMag.contains("Delete operation successful")){
+        logger_->log("文件成功删除");
+    }
 }
