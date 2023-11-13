@@ -41,19 +41,20 @@ private:
     bool ifStartList_{false};
     bool ifListFinished_{false};
     quint64 downloadSize_{0};
-    QString downloadFileName_;
     QString uploadFilePath_;
-
+    float transferPercentage_{0};
 public:
     explicit Client(QObject *parent = nullptr);
+    QString downloadFileName_;
 
     ~Client() override;
 
     QString curServerPath_;
     QString curClientPath_;
+    bool isControlSocketConnected{false};
 
     void connectTo(const QHostAddress &, quint16);
-
+    void disconnectFrom();
 
     Logger *getLogger();
 
@@ -80,6 +81,10 @@ public:
 
     void DELE(const QString &);
 
+    void RNFR(const QString &);
+
+    void RNTO(const QString &);
+
     void handleFtpResp(const FtpResp &);
 
     void handle257(const FtpResp &ftpResp);
@@ -93,7 +98,7 @@ public:
     void handle425(const FtpResp &ftpResp);
 
     void handle250(const FtpResp &ftpResp);
-
+    void handle350(const FtpResp &fptResp);
 signals:
 
     void fileTableUpdate(const QVector<FtpFileInfo> &);
@@ -106,7 +111,9 @@ signals:
 
     void controlSocketDisconnected();
 
-    void startWorking();
+    void startTransfer();
+    void processTransfer(float downloadPercentage);
+    void finishTransfer();
 
 public slots:
 
@@ -125,8 +132,7 @@ public slots:
     void onDataSocketReadyRead();
 
     void onDataSocketWritten();
-
-
+    void onDownloadProcessUpdate(quint64 downloadedSize);
 };
 
 

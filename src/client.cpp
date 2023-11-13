@@ -20,6 +20,7 @@ Client::Client(QObject *parent) : QObject(parent) {
     connect(dataSocket_, &QTcpSocket::bytesWritten, this, &Client::onDataSocketWritten);
 
     workerThread_ = new Thread(&dataReadBuffer_, dataSocket_, &mutex_, &cv_);
+    connect(workerThread_,&Thread::downloadProcess,this,&Client::onDownloadProcessUpdate);
     workerThread_->start();
 }
 
@@ -28,26 +29,34 @@ Client::~Client() {
     delete controlSocket_;
     delete dataSocket_;
     workerThread_->quit();
-    workerThread_->wait();
+//    workerThread_->wait();
     delete workerThread_;
 }
 
 void Client::connectTo(const QHostAddress &host, quint16 port) {
     controlSocket_->connectToHost(host, port);
     //初始化客户端路径
+}
+
+void Client::disconnectFrom() {
+    controlSocket_->disconnected();
+}
+
+
+void Client::onControlSocketConnected() {
+    isControlSocketConnected = true;
+    logger_->log("控制连接成功");
     QStringList desktopPaths = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
     if (!desktopPaths.empty()) {
         curClientPath_ = desktopPaths.first();
         emit clientPathUpdate(curClientPath_);
     }
-}
-
-
-void Client::onControlSocketConnected() {
     emit controlSocketConnected();
 }
 
 void Client::onControlSocketDisconnected() {
+    isControlSocketConnected = false;
+    logger_->log("控制连接已断开");
     emit controlSocketDisconnected();
 }
 
@@ -91,7 +100,7 @@ void Client::handleFtpResp(const FtpResp &ftpResp) {
             break;
         }
         case FTP_CONNECT_SUCCESS: {
-            logger_->log("连接成功");
+//            logger_->log("连接成功");
             break;
         }
         case FTP_LOGIN_SUCCESS: {
@@ -129,7 +138,7 @@ void Client::handleFtpResp(const FtpResp &ftpResp) {
             handle257(ftpResp);
             break;
         }
-        case FTP_COMMAND_OK:{
+        case FTP_COMMAND_OK: {
             handle250(ftpResp);
             break;
         }
@@ -190,7 +199,6 @@ void Client::MKD(const QString &dirPath) {
     controlSocket_->write(cmd.toUtf8());
     LIST();
 }
-
 void Client::RMD(const QString &dirPath) {
     QString cmd = "RMD " + dirPath + "\r\n";
     controlSocket_->write(cmd.toUtf8());
@@ -225,6 +233,17 @@ void Client::DELE(const QString &filePath) {
     controlSocket_->write(cmd.toUtf8());
 }
 
+void Client::RNFR(const QString &filePath) {
+    QString cmd="RNFR "+filePath+"\r\n";
+    controlSocket_->write(cmd.toUtf8());
+}
+
+void Client::RNTO(const QString &filePath) {
+    QString cmd="RNTO "+filePath+"\r\n";
+    controlSocket_->write(cmd.toUtf8());
+}
+
+
 void Client::handle257(const FtpResp &ftpResp) {
     QString statusMsg = ftpResp.statusMsg_;
     QString path = qMove(Util::parsePath(ftpResp.statusMsg_));
@@ -249,7 +268,9 @@ void Client::handle150(const FtpResp &ftpResp) {
         QPair<QString, quint64> downLoadInfo = Util::parseDownloadInfo(ftpResp.statusMsg_);
         downloadSize_ = downLoadInfo.second;
         downloadFileName_ = Util::parseFileName(downLoadInfo.first);
-        logger_->log("开始下载文件:"+downloadFileName_);
+        logger_->log("开始下载文件:" + downloadFileName_);
+        transferPercentage_=0.0f;
+        emit startTransfer();
     } else if (statusMsg.contains("Here comes the directory listing")) {
         qDebug() << "update list state: startList" << "\n";
         ifStartList_ = true;
@@ -281,7 +302,7 @@ void Client::handle226(const FtpResp &ftpResp) {
             dataReadBuffer_.remove(0, downloadSize_);
             file.close();
             logger_->log("文件下载成功");
-//            qDebug() << "dataBuffer size" << dataReadBuffer_.size() << '\n';
+            emit finishTransfer();
         } else if (ifStartSendTransfer_ && !ifSendTransferFinished_) {
             ifSendTransferFinished_ = true;
             ifStartSendTransfer_ = false;
@@ -309,8 +330,22 @@ void Client::handle425(const FtpResp &ftpResp) {
 }
 
 void Client::handle250(const FtpResp &ftpResp) {
-    QString statusMag=ftpResp.statusMsg_;
-    if(statusMag.contains("Delete operation successful")){
+    QString statusMag = ftpResp.statusMsg_;
+    if (statusMag.contains("Delete operation successful")) {
         logger_->log("文件成功删除");
+        LIST();
+    }else if(statusMag.contains("Directory successfully changed")){
+        logger_->log("更名成功");
+        LIST();
+    }else if(statusMag.contains("Rename successful")){
+        logger_->log("更名成功");
+        LIST();
     }
 }
+
+void Client::onDownloadProcessUpdate(quint64 downloadedSize) {
+    transferPercentage_=static_cast<float>(downloadedSize)/static_cast<float>(downloadSize_);
+    emit processTransfer(transferPercentage_);
+}
+
+

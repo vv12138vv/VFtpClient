@@ -26,7 +26,8 @@ public:
     Thread(QByteArray* dataBuffer,QTcpSocket* dataSocket,QMutex* mutex,QWaitCondition* cv);
     ~Thread()=default;
     void run() override;
-
+signals:
+    void downloadProcess(quint64 downloadedSize);
 };
 
 

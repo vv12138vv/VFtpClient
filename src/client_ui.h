@@ -15,6 +15,8 @@
 #include<QMenu>
 #include<QMainWindow>
 #include "client.h"
+#include<QInputDialog>
+#include<QTimer>
 QT_BEGIN_NAMESPACE
 namespace Ui { class ClientUi; }
 QT_END_NAMESPACE
@@ -34,6 +36,7 @@ private:
     QPair<int,int> selectedServerItem_;
     QString mkDirInput_;
     QString rmDirInput_;
+    QString renameInput_;
 public:
     explicit ClientUi(QWidget *parent = nullptr);
 
@@ -44,6 +47,7 @@ public:
 signals:
 
     void clientTableUpdate(const QString& path);
+
 
 public slots:
 
@@ -87,18 +91,19 @@ public slots:
     void onControlSocketConnected();
     void onControlSocketDisconnected();
 
-
-//    void onPWDtestBtnClicked();
-//
-//    void onLISTtestBtnClicked();
-//
-//    void onPASVtestBtnClicked();
-
+    void onRenameClicked();
 
     void onDeleteBtnClicked();
 
     void onShowServerContextMenu(const QPoint &pos);
     void onShowClientContextMenu(const QPoint& pos);
+    void onUpdateListBtnClicked();
+
+    void onClientUpdateListBtnClicked();
+
+    void onStartTransfer();
+    void onProcessTransfer(float transferPercentage);
+    void onFinishTransfer();
 };
 
 

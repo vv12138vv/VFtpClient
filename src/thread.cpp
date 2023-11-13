@@ -16,8 +16,11 @@ void Thread::run() {
         mutex_->lock();
         cv_->wait(mutex_);
         QByteArray data=dataSocket_->readAll();
+        quint64 downloadedSize=data.length();
         dataBuffer_->append(qMove(data));
         mutex_->unlock();
+//        qDebug()<<"downloadedSize:"<<downloadedSize<<'\n';
+        emit downloadProcess(downloadedSize);
     }
 }
 

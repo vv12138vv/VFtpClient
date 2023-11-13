@@ -224,7 +224,7 @@
   <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>650</x>
+     <x>530</x>
      <y>330</y>
      <width>231</width>
      <height>31</height>
@@ -329,6 +329,70 @@
    </property>
    <property name="text">
     <string>Disconnected</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="updateListBtn">
+   <property name="geometry">
+    <rect>
+     <x>960</x>
+     <y>330</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="clientUpdateListBtn">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>330</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="RNFTBtn">
+   <property name="geometry">
+    <rect>
+     <x>780</x>
+     <y>330</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>RNFR</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="RNTOBtn">
+   <property name="geometry">
+    <rect>
+     <x>870</x>
+     <y>330</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string>RNTO</string>
    </property>
   </widget>
  </widget>

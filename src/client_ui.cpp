@@ -13,6 +13,14 @@ ClientUi::ClientUi(QWidget *parent) :
     ui->setupUi(this);
     client_ = new Client(this);
     initSlots();
+    QPixmap updateIcon;
+    updateIcon.load(":/res/Update.png");
+    QIcon updateListIcon(updateIcon);
+    ui->updateListBtn->setIcon(updateListIcon);
+    ui->clientUpdateListBtn->setIcon(updateListIcon);
+    ui->transferType->setVisible(false);
+    ui->transferFileInfo->setVisible(false);
+    ui->transferProgressBar->setVisible(false);
 }
 
 ClientUi::~ClientUi() {
@@ -43,20 +51,23 @@ void ClientUi::initSlots() {
     connect(ui->clientFileTable, &QTableWidget::customContextMenuRequested, this, &ClientUi::onShowClientContextMenu);
     connect(client_,&Client::controlSocketConnected,this,&ClientUi::onControlSocketConnected);
     connect(client_,&Client::controlSocketDisconnected,this,&ClientUi::onControlSocketDisconnected);
-    //for test
-//    connect(ui->PWDtestBtn, &QPushButton::clicked, this, &ClientUi::onPWDtestBtnClicked);
-//    connect(ui->LISTtestBtn, &QPushButton::clicked, this, &ClientUi::onLISTtestBtnClicked);
-//    connect(ui->PASVtestBtn, &QPushButton::clicked, this, &ClientUi::onPASVtestBtnClicked);
-//    connect(ui->DELEtestBtn, &QPushButton::clicked, this, &ClientUi::onDeleteBtnClicked);
+    connect(ui->updateListBtn,&QPushButton::clicked,this,&ClientUi::onUpdateListBtnClicked);
+    connect(ui->clientUpdateListBtn,&QPushButton::clicked,this,&ClientUi::onClientUpdateListBtnClicked);
+    connect(client_,&Client::startTransfer,this,&ClientUi::onStartTransfer);
+    connect(client_,&Client::finishTransfer,this, &ClientUi::onFinishTransfer);
+    connect(client_,&Client::processTransfer,this,&ClientUi::onProcessTransfer);
 }
 
 void ClientUi::onConnectBtnClicked() {
-//    if(targetHost_.isNull()||targetPort_==0||username_.isNull()||password_.isNull()){
-//        return;
-//    }
-//    QHostAddress host("124.223.65.182");
-//    quint32 port = 21;
-    client_->connectTo(targetHost_, targetPort_);
+    if(targetHost_.isNull()||targetPort_==0){
+        client_->getLogger()->log("请输入正确的服务器信息");
+        return;
+    }
+    if(!client_->isControlSocketConnected){
+        client_->connectTo(targetHost_, targetPort_);
+    }else{
+        client_->disconnectFrom();
+    }
 }
 
 void ClientUi::onPortBarEdited() {
@@ -100,6 +111,10 @@ void ClientUi::onNewLog(const QString &logMsg) {
 }
 
 void ClientUi::onLoginBtnClicked() {
+    if(!client_->isControlSocketConnected){
+        client_->getLogger()->log("请先连接服务器");
+        return;
+    }
     client_->USER(username_);
     client_->PASS(password_);
 }
@@ -256,6 +271,10 @@ void ClientUi::onClientFileTableCell2Clicked(int row, int column) {
 }
 
 void ClientUi::onUploadBtnClicked() {
+    if(!client_->isControlSocketConnected){
+        client_->getLogger()->log("请先登录");
+        return;
+    }
     auto item = ui->clientFileTable->item(selectedClientItem_.first, 0);
     if (ui->clientFileTable->item(selectedClientItem_.first, 0 + 1)->text() == "Folder") {
         return;
@@ -265,6 +284,10 @@ void ClientUi::onUploadBtnClicked() {
 }
 
 void ClientUi::onDownloadBtnClicked() {
+    if(!client_->isControlSocketConnected){
+        client_->getLogger()->log("请先登录");
+        return;
+    }
     auto item = ui->serverFileTable->item(selectedServerItem_.first, 0);
     if (ui->serverFileTable->item(selectedServerItem_.first, 0 + 1)->text() == "Folder") {
         return;
@@ -284,6 +307,10 @@ void ClientUi::onMkDirBarEdited() {
 //}
 
 void ClientUi::onMkDirBtnClicked() {
+    if(!client_->isControlSocketConnected){
+        client_->getLogger()->log("请先登录");
+        return;
+    }
     QString folderPath = client_->curServerPath_ + '/' + mkDirInput_;
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "Confirm", "确认执行该操作吗？", QMessageBox::Yes | QMessageBox::No);
@@ -294,6 +321,10 @@ void ClientUi::onMkDirBtnClicked() {
 }
 
 void ClientUi::onRmDirBtnClicked() {
+    if(!client_->isControlSocketConnected){
+        client_->getLogger()->log("请先登录");
+        return;
+    }
     QString folderPath = client_->curServerPath_ + '/' + rmDirInput_;
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "Confirm", "确认执行该操作吗？", QMessageBox::Yes | QMessageBox::No);
@@ -304,6 +335,10 @@ void ClientUi::onRmDirBtnClicked() {
 }
 
 void ClientUi::onDeleteBtnClicked() {
+    if(!client_->isControlSocketConnected){
+        client_->getLogger()->log("请先登录");
+        return;
+    }
     auto item = ui->serverFileTable->item(selectedServerItem_.first, 0);
     if (ui->serverFileTable->item(selectedServerItem_.first, 0 + 1)->text() == "Folder") {
         return;
@@ -328,6 +363,7 @@ void ClientUi::onShowServerContextMenu(const QPoint &pos) {
     if(item->text()=="Folder"){
         QPointer<QAction> openAction = menu.addAction("open");
         QPointer<QAction> rmDirAction=menu.addAction("delete");
+        QPointer<QAction> renameDirAction=menu.addAction("rename");
         QAction *selectedAction = menu.exec(ui->serverFileTable->viewport()->mapToGlobal(pos));
         if (selectedAction == openAction) {
             qDebug() << "open" << "\n";
@@ -337,10 +373,16 @@ void ClientUi::onShowServerContextMenu(const QPoint &pos) {
             auto item1 =ui->serverFileTable->item(row,0);
             rmDirInput_=item1->text();
             onRmDirBtnClicked();
+        }else if(selectedAction==renameDirAction){
+            qDebug()<<"renameDir"<<'\n';
+            auto item1=ui->serverFileTable->item(row,0);
+            renameInput_=item1->text();
+            onRenameClicked();
         }
     }else if(item->text()=="File"){
         QPointer<QAction> downloadAction=menu.addAction("download");
         QPointer<QAction> deleteAction=menu.addAction("delete");
+        QPointer<QAction> renameAction=menu.addAction("rename");
         QAction *selectedAction = menu.exec(ui->serverFileTable->viewport()->mapToGlobal(pos));
         if (selectedAction == downloadAction) {
             qDebug() << "download" << "\n";
@@ -348,6 +390,11 @@ void ClientUi::onShowServerContextMenu(const QPoint &pos) {
         }else if(selectedAction==deleteAction){
             qDebug()<<"delete file"<<'\n';
             onDeleteBtnClicked();
+        }else if(selectedAction==renameAction){
+            qDebug()<<"renameDir"<<'\n';
+            auto item1=ui->serverFileTable->item(row,0);
+            renameInput_=item1->text();
+            onRenameClicked();
         }
     }
 
@@ -358,16 +405,78 @@ void ClientUi::onShowClientContextMenu(const QPoint &pos) {
 }
 
 void ClientUi::onControlSocketConnected() {
+    ui->connectBtn->setText("Disconnect");
     QString connectionStatus("Connected");
     ui->connectionStatus->setText(connectionStatus);
     ui->connectionStatus->setStyleSheet("color: green;");
 }
 
 void ClientUi::onControlSocketDisconnected() {
+    ui->connectBtn->setText("Connect");
     QString connectionStatus("Disconnected");
     ui->connectionStatus->setText(connectionStatus);
     ui->connectionStatus->setStyleSheet("color: red;");
 }
 
+void ClientUi::onUpdateListBtnClicked() {
+    if(!client_->isControlSocketConnected){
+        client_->getLogger()->log("请先登录");
+        return;
+    }
+    client_->LIST();
+}
 
+void ClientUi::onClientUpdateListBtnClicked() {
+    if(!client_->isControlSocketConnected){
+        client_->getLogger()->log("请先登录");
+        return;
+    }
+    onClientPathUpdate(client_->curClientPath_);
+}
+
+
+void ClientUi::onRenameClicked() {
+    bool ok{false};
+    QString newName=QInputDialog::getText(this,"Rename","输入新文件名：",QLineEdit::Normal,"",&ok);
+    if(ok&&!newName.isEmpty()){
+        client_->RNFR(client_->curServerPath_+'/'+renameInput_);
+        client_->RNTO(client_->curServerPath_+'/'+newName);
+    }
+}
+
+void ClientUi::onStartTransfer() {
+    ui->transferProgressBar->setMinimum(0);
+    ui->transferProgressBar->setMaximum(100);
+    ui->transferFileInfo->setText(client_->downloadFileName_);
+    ui->transferType->setText("Download");
+    ui->transferProgressBar->setValue(0);
+
+    ui->transferType->setVisible(true);
+    ui->transferFileInfo->setVisible(true);
+    ui->transferProgressBar->setVisible(true);
+
+}
+
+void ClientUi::onFinishTransfer() {
+    ui->transferProgressBar->setMinimum(0);
+    ui->transferProgressBar->setMaximum(100);
+    ui->transferProgressBar->setValue(100);
+
+    QTimer::singleShot(3000,this,[&](){
+       ui->transferProgressBar->setVisible(false);
+       ui->transferType->setVisible(false);
+       ui->transferFileInfo->setVisible(false);
+    });
+}
+
+void ClientUi::onProcessTransfer(float transferPercentage) {
+    ui->transferProgressBar->setMinimum(0);
+    ui->transferProgressBar->setMaximum(100);
+    int value=static_cast<int>(transferPercentage*100+0.7)+ui->transferProgressBar->value();
+    if(value>=92){
+        ui->transferProgressBar->setValue(92);
+    }else{
+        ui->transferProgressBar->setValue(value);
+    }
+}
 

@@ -15,6 +15,7 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QProgressBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QTextBrowser>
@@ -53,6 +54,11 @@ public:
     QPushButton *downloadBtn;
     QLabel *connectionStatusLabel;
     QLabel *connectionStatus;
+    QPushButton *updateListBtn;
+    QPushButton *clientUpdateListBtn;
+    QProgressBar *transferProgressBar;
+    QLabel *transferFileInfo;
+    QLabel *transferType;
 
     void setupUi(QWidget *ClientUi)
     {
@@ -139,7 +145,7 @@ public:
 
         horizontalLayoutWidget = new QWidget(ClientUi);
         horizontalLayoutWidget->setObjectName("horizontalLayoutWidget");
-        horizontalLayoutWidget->setGeometry(QRect(650, 330, 231, 31));
+        horizontalLayoutWidget->setGeometry(QRect(530, 330, 231, 31));
         mkdirLayout = new QHBoxLayout(horizontalLayoutWidget);
         mkdirLayout->setObjectName("mkdirLayout");
         mkdirLayout->setContentsMargins(0, 0, 0, 0);
@@ -182,6 +188,24 @@ public:
         font3.setPointSize(10);
         connectionStatus->setFont(font3);
         connectionStatus->setStyleSheet(QString::fromUtf8("color: red;"));
+        updateListBtn = new QPushButton(ClientUi);
+        updateListBtn->setObjectName("updateListBtn");
+        updateListBtn->setGeometry(QRect(960, 330, 30, 30));
+        updateListBtn->setCursor(QCursor(Qt::PointingHandCursor));
+        clientUpdateListBtn = new QPushButton(ClientUi);
+        clientUpdateListBtn->setObjectName("clientUpdateListBtn");
+        clientUpdateListBtn->setGeometry(QRect(430, 330, 30, 30));
+        clientUpdateListBtn->setCursor(QCursor(Qt::PointingHandCursor));
+        transferProgressBar = new QProgressBar(ClientUi);
+        transferProgressBar->setObjectName("transferProgressBar");
+        transferProgressBar->setGeometry(QRect(530, 200, 291, 21));
+        transferProgressBar->setValue(24);
+        transferFileInfo = new QLabel(ClientUi);
+        transferFileInfo->setObjectName("transferFileInfo");
+        transferFileInfo->setGeometry(QRect(660, 170, 70, 20));
+        transferType = new QLabel(ClientUi);
+        transferType->setObjectName("transferType");
+        transferType->setGeometry(QRect(530, 170, 70, 20));
 
         retranslateUi(ClientUi);
 
@@ -202,6 +226,10 @@ public:
         downloadBtn->setText(QCoreApplication::translate("ClientUi", "<<", nullptr));
         connectionStatusLabel->setText(QCoreApplication::translate("ClientUi", "Connection Status\357\274\232", nullptr));
         connectionStatus->setText(QCoreApplication::translate("ClientUi", "Disconnected", nullptr));
+        updateListBtn->setText(QString());
+        clientUpdateListBtn->setText(QString());
+        transferFileInfo->setText(QCoreApplication::translate("ClientUi", "fileName", nullptr));
+        transferType->setText(QCoreApplication::translate("ClientUi", "taskType", nullptr));
     } // retranslateUi
 
 };
